@@ -6,7 +6,7 @@
 /*   By: alexandr <alexandr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/01/26 17:04:59 by alexandr         ###   ########.fr       */
+/*   Updated: 2021/01/26 18:11:27 by alexandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,18 +26,18 @@ void	ft_lstprint(t_list *lst)
 
 int		make_map(t_list **begin, int size)
 {
-	t_list	*tmp;
+	t_list	*tmp = *begin;
 	int		i;
 
 	i = 0;
-	tmp = *begin;
+
 	g_pars.map = ft_calloc(size + 1, sizeof(char*));
 	while (tmp)
 	{
 		g_pars.map[i++] = tmp->content;
 		tmp = tmp->next;
 	}
-	ft_lstclear(begin, free);
+	//ft_lstclear(begin, free);
 	i = 0;
 	while (g_pars.map[i])
 	{
@@ -73,40 +73,34 @@ int main(int argc, char const *argv[])
 	int		fd;
 	char	*line;
 	t_list	*begin;
-	t_list	*tmp;
 	
-	line = 0;
-	begin = 0;
+	
+	line = NULL;
+	begin = NULL;
 	fd = open("./maps/test.cub", O_RDONLY);
-	while (get_next_line(fd, &line) > 0)
+	while (get_next_line(fd, &line))
 	{
 
 		if (ft_strchr("NRSWEFC", *line))
 			ft_parse_settings(line);
 		else // parse map 
-		{
-			tmp = ft_lstnew(line);
-			ft_lstadd_back(&begin, tmp);
-			printf("%s\n", (char *)tmp->content);
-		}
-		free(line);
-		line = 0;
+			ft_lstadd_back(&begin, ft_lstnew(line));
+		// free(line); а не протекает ли?
+		// line = NULL;
 	}
 	ft_lstadd_back(&begin, ft_lstnew(line));
-	//make_map(&begin, ft_lstsize(begin));
-	free(line);
-	line = 0;
-
+	make_map(&begin, ft_lstsize(begin));
+	
 	printf("%d size lst\n", ft_lstsize(begin));
-	ft_lstprint(begin);
-	// printf("%s\n", g_pars.resolution);
-	// printf("%s\n", g_pars.n_textures);
-	// printf("%s\n", g_pars.s_textures);
-	// printf("%s\n", g_pars.w_textures);
-	// printf("%s\n", g_pars.e_textures);
-	// printf("%s\n", g_pars.sprt_textures);
-	// printf("%s\n", g_pars.flr_textures);
-	// printf("%s\n", g_pars.cl_textures);
+	//ft_lstprint(begin);
+	printf("%s\n", g_pars.resolution);
+	printf("%s\n", g_pars.n_textures);
+	printf("%s\n", g_pars.s_textures);
+	printf("%s\n", g_pars.w_textures);
+	printf("%s\n", g_pars.e_textures);
+	printf("%s\n", g_pars.sprt_textures);
+	printf("%s\n", g_pars.flr_textures);
+	printf("%s\n", g_pars.cl_textures);
 	
 	close(fd);
 	return 0;
