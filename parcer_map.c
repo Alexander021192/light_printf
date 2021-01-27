@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parcer.c                                           :+:      :+:    :+:   */
+/*   parcer_map.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexandr <alexandr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/01/26 18:11:27 by alexandr         ###   ########.fr       */
+/*   Updated: 2021/01/27 17:41:37 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,36 +15,54 @@
 
 #include <stdio.h>
 
-void	ft_lstprint(t_list *lst)
+char	*ft_cut_space(char *str)
 {
-	while (lst)
+	int		count_space;
+	char	*line_without_space;
+	int		i;
+
+	i = 0;
+	count_space = 0;
+	while(str && str[i++])
 	{
-		printf("%s\n", (char *)lst->content);
-		lst = lst->next;
+		if(str[i] == ' ')
+			count_space++;
 	}
+	line_without_space = malloc(ft_strlen(str) - count_space);
+	i = 0;
+	while(str && *str)
+	{
+		if( *str != ' ')
+			line_without_space[i++] = *str;
+		str++;
+	}
+	//free(line) ? 
+	
+	return(line_without_space);
 }
 
-int		make_map(t_list **begin, int size)
+char	**make_map(t_list **begin, int size)
 {
 	t_list	*tmp = *begin;
+	char	**map;
 	int		i;
 
 	i = 0;
 
-	g_pars.map = ft_calloc(size + 1, sizeof(char*));
+	map = ft_calloc(size + 1, sizeof(char*));
 	while (tmp)
 	{
-		g_pars.map[i++] = tmp->content;
+		map[i++] = tmp->content;
 		tmp = tmp->next;
 	}
 	//ft_lstclear(begin, free);
-	i = 0;
-	while (g_pars.map[i])
-	{
-		ft_putendl_fd(g_pars.map[i], 1);
-		i++;
-	}
-	return (0);
+	// i = 0;
+	// while (map[i])
+	// {
+	// 	ft_putendl_fd(map[i], 1);
+	// 	i++;
+	// }
+	return (map);
 }
 
 int		ft_parse_settings(char *str)
@@ -68,40 +86,39 @@ int		ft_parse_settings(char *str)
 	return (0);
 }
 
-int main(int argc, char const *argv[])
+char	**ft_read_map(void)
 {
 	int		fd;
 	char	*line;
 	t_list	*begin;
-	
-	
+		
 	line = NULL;
 	begin = NULL;
-	fd = open("./maps/test.cub", O_RDONLY);
+	fd = open("./maps/test5.cub", O_RDONLY);
 	while (get_next_line(fd, &line))
 	{
 
 		if (ft_strchr("NRSWEFC", *line))
 			ft_parse_settings(line);
 		else // parse map 
-			ft_lstadd_back(&begin, ft_lstnew(line));
+			ft_lstadd_back(&begin, ft_lstnew(ft_cut_space(line)));
 		// free(line); а не протекает ли?
 		// line = NULL;
 	}
-	ft_lstadd_back(&begin, ft_lstnew(line));
-	make_map(&begin, ft_lstsize(begin));
+	ft_lstadd_back(&begin, ft_lstnew(ft_cut_space(line)));
 	
-	printf("%d size lst\n", ft_lstsize(begin));
+	// printf("%d size lst\n", ft_lstsize(begin));
 	//ft_lstprint(begin);
-	printf("%s\n", g_pars.resolution);
-	printf("%s\n", g_pars.n_textures);
-	printf("%s\n", g_pars.s_textures);
-	printf("%s\n", g_pars.w_textures);
-	printf("%s\n", g_pars.e_textures);
-	printf("%s\n", g_pars.sprt_textures);
-	printf("%s\n", g_pars.flr_textures);
-	printf("%s\n", g_pars.cl_textures);
+	// printf("%s\n", g_pars.resolution);
+	// printf("%s\n", g_pars.n_textures);
+	// printf("%s\n", g_pars.s_textures);
+	// printf("%s\n", g_pars.w_textures);
+	// printf("%s\n", g_pars.e_textures);
+	// printf("%s\n", g_pars.sprt_textures);
+	// printf("%s\n", g_pars.flr_textures);
+	// printf("%s\n", g_pars.cl_textures);
 	
 	close(fd);
-	return 0;
+	
+	return (make_map(&begin, ft_lstsize(begin)));
 }
