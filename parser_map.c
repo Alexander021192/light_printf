@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parcer_map.c                                       :+:      :+:    :+:   */
+/*   parser_map.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/01/27 17:41:37 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/03 16:34:34 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,21 @@ char	*ft_cut_space(char *str)
 	count_space = 0;
 	while(str && str[i++])
 	{
-		if(str[i] == ' ')
+		if(str[i] == ' ' && (str[i + 1] && str[i + 1] != ' '))
 			count_space++;
 	}
+	//printf("{%d} space count str {%s}\n", count_space, str);
 	line_without_space = malloc(ft_strlen(str) - count_space);
 	i = 0;
 	while(str && *str)
 	{
-		if( *str != ' ')
+		if( *str != ' ' || ((*str == ' ' && str[1] && str[1] == ' ')))
 			line_without_space[i++] = *str;
 		str++;
 	}
+	line_without_space[i] = 0;
 	//free(line) ? 
-	
+	//printf("{%d} space count str {%s}\n", count_space, line_without_space);
 	return(line_without_space);
 }
 
@@ -94,7 +96,7 @@ char	**ft_read_map(void)
 		
 	line = NULL;
 	begin = NULL;
-	fd = open("./maps/test5.cub", O_RDONLY);
+	fd = open("./maps/test.cub", O_RDONLY);
 	while (get_next_line(fd, &line))
 	{
 

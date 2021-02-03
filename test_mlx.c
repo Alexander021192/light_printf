@@ -6,11 +6,12 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 11:40:26 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/01/27 14:30:22 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/03 16:15:07 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./includes/mlx.h"
+#include <math.h>
 #include <stdio.h>
 
 int		rgb_to_hex(int t, int r, int g, int b)
@@ -66,19 +67,42 @@ int             key_hook3(int keycode,  t_vars *vars)
 
 int             main(void)
 {
-    t_vars    vars;
-	void 	*img;
-	char *relative_path = "./weapons.xpm";
-	
-    vars.mlx = mlx_init();
-	img = mlx_xpm_file_to_image(vars.mlx, relative_path, 100, 100);
-    vars.win = mlx_new_window(vars.mlx, 640, 480, "Hello world!");
-    // mlx_hook(vars.win, 2, 1L<<0, key_hook, &vars);
-	
-	// mlx_hook(vars.win, 3, 1L<<1, key_hook3, &vars);
-	
-	// mlx_hook(vars.win, 6, 1L<<2, key_hook2, &vars);
+    void    *mlx;
+    void    *mlx_win;
+    t_data  img;
 
+	int x, y = {0};
+
+    mlx = mlx_init();
+    mlx_win = mlx_new_window(mlx, 640, 480, "Hello world!");
+    img.img = mlx_new_image(mlx, 400, 400);
+    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
+                                 &img.endian);
 	
-    mlx_loop(vars.mlx);
-} 
+	while(x++ < 350)
+	{
+		y = 0;
+		while (y++ < 350)
+			my_mlx_pixel_put(&img, sqrt(y*y - 100*100), sqrt(x*x - 100*100), 0x00FF0000);
+	}
+	
+    mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+
+	long long int i = 0;
+
+	img.img = mlx_new_image(mlx, 400, 400);
+    img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
+                                 &img.endian);
+
+	x = 0;
+	y = 0;
+	while(x++ < 100)
+	{
+		y = 50;
+		while (y++ < 100)
+			my_mlx_pixel_put(&img, x, y, 0x80FFFF00);
+	}
+	
+    mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
+	mlx_loop(mlx);
+}

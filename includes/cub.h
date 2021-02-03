@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/01/27 17:04:27 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/03 17:31:23 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define CUB_H
 
 #define SCALE 16 // условный размер каждого квадратика в карте
+
+#	include <math.h>
 
 typedef struct	s_win //структура для окна
 {
@@ -28,8 +30,8 @@ typedef struct	s_win //структура для окна
 
 typedef struct	s_point // структура для точки
 {
-	int			x;
-	int			y;
+	float			x;
+	float			y;
 }				  t_point;
 
 typedef struct	s_plr //структура для игрока и луча
