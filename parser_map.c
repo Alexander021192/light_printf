@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/03 16:34:34 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/04 14:57:56 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,21 +70,21 @@ char	**make_map(t_list **begin, int size)
 int		ft_parse_settings(char *str)
 {
 	if(ft_strnstr(str, "R ", 2))
-		g_pars.resolution = ft_strdup(str + 2);
+		g_tex.resolution = ft_strdup(str + 2);
 	else if(ft_strnstr(str, "NO ", 3))
-		g_pars.n_textures = ft_strdup(str + 3);
+		g_tex.n_textures = ft_strdup(str + 3);
 	else if(ft_strnstr(str, "SO ", 3))
-		g_pars.s_textures = ft_strdup(str + 3);
+		g_tex.s_textures = ft_strdup(str + 3);
 	else if(ft_strnstr(str, "WE ", 3))
-		g_pars.w_textures = ft_strdup(str + 3);
+		g_tex.w_textures = ft_strdup(str + 3);
 	else if(ft_strnstr(str, "EA ", 3))
-		g_pars.e_textures = ft_strdup(str + 3);
+		g_tex.e_textures = ft_strdup(str + 3);
 	else if(ft_strnstr(str, "S ", 2))
-		g_pars.sprt_textures = ft_strdup(str + 2);
+		g_tex.sprt_textures = ft_strdup(str + 2);
 	else if(ft_strnstr(str, "F ", 2))
-		g_pars.flr_textures = ft_strdup(str + 2);
+		g_tex.flr_textures = ft_strdup(str + 2);
 	else if(ft_strnstr(str, "C ", 2))
-		g_pars.cl_textures = ft_strdup(str + 2);
+		g_tex.cl_textures = ft_strdup(str + 2);
 	return (0);
 }
 

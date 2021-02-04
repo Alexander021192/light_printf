@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/03 17:31:23 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/04 14:57:36 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,29 @@
 # define CUB_H
 
 #define SCALE 16 // условный размер каждого квадратика в карте
+
+# define KEY_1			18
+# define KEY_2			19
+# define KEY_3			20
+# define KEY_4			21
+# define KEY_Q			12
+# define KEY_W			13
+# define KEY_E			14
+# define KEY_R			15
+# define KEY_A			0
+# define KEY_S			1
+# define KEY_D			2
+# define KEY_I			34
+# define KEY_O			31
+# define KEY_P			35
+# define KEY_J			38
+# define KEY_K			40
+# define KEY_L			37
+# define KEY_LEFT		123
+# define KEY_RIGHT		124
+# define KEY_FORWARD 	126
+# define KEY_BACKWARD	125
+# define KEY_ESC		53
 
 #	include <math.h>
 
@@ -41,6 +64,9 @@ typedef struct	s_plr //структура для игрока и луча
 	float		dir;
 	float		start;
 	float		end;
+	t_point		x_move;
+	t_point		y_move;
+	t_point		rotate;
 }				  t_plr;
 
 typedef struct	s_all // структура для всего вместе
@@ -50,7 +76,7 @@ typedef struct	s_all // структура для всего вместе
 	char		**map;
 }				  t_all;
 
-typedef	struct		s_pars
+typedef	struct		s_tex
 {
 	char	*resolution;
 	char	*n_textures;
@@ -60,9 +86,9 @@ typedef	struct		s_pars
 	char	*sprt_textures;
 	char	*flr_textures;
 	char	*cl_textures;
-}					t_pars;
+}					t_tex;
 
-t_pars	g_pars;
+t_tex				g_tex;
 
 char	**ft_read_map(void);
 
