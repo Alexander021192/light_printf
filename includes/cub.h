@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/04 14:57:36 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/08 14:14:50 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ typedef struct	s_win //структура для окна
 	void		*win;
 	void		*img;
 	void		*addr;
-	int			line_l;
+	int			line_lenght;
 	int			bpp;
 	int			en;
 }				  t_win;
