@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/04 14:57:56 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/11 12:32:31 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ char	**ft_read_map(void)
 	}
 	ft_lstadd_back(&begin, ft_lstnew(ft_cut_space(line)));
 	
-	// printf("%d size lst\n", ft_lstsize(begin));
+	//printf("%d size lst\n", ft_lstsize(begin));
 	//ft_lstprint(begin);
 	// printf("%s\n", g_pars.resolution);
 	// printf("%s\n", g_pars.n_textures);
@@ -124,3 +124,17 @@ char	**ft_read_map(void)
 	
 	return (make_map(&begin, ft_lstsize(begin)));
 }
+
+// int		main()
+// {
+// 	char **map;
+
+// 	map = ft_read_map();
+// 	int	i = 0;
+// 	while (map[i])
+// 	{
+// 		ft_putendl_fd(map[i], 1);
+// 		i++;
+// 	}
+// 	return 0;
+// }

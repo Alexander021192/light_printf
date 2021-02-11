@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/08 14:14:50 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/11 16:05:32 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,41 +40,48 @@
 
 #	include <math.h>
 
-typedef struct	s_win //структура для окна
-{
-	void		*mlx;
-	void		*win;
-	void		*img;
-	void		*addr;
-	int			line_lenght;
-	int			bpp;
-	int			en;
-}				  t_win;
-
 typedef struct	s_point // структура для точки
 {
-	float			x;
-	float			y;
+	double			x;
+	double			y;
 }				  t_point;
+
+typedef struct	s_image
+{
+	void	*img;
+	void	*ptr;
+	int		bpp;
+	int		line_lenght;
+	int		endian;
+}				t_image;
+
+typedef	struct	s_win //структура для окна
+{
+	void		*ptr;
+	void		*win;
+	t_image		screen;
+}				t_win;
+
 
 typedef struct	s_plr //структура для игрока и луча
 {
-	float		x;
-	float		y;
-	float		dir;
-	float		start;
-	float		end;
+	double		start; //why i need this
+	double		end;	// and this
+	double		dir;
+	t_point		pos;
 	t_point		x_move;
 	t_point		y_move;
 	t_point		rotate;
-}				  t_plr;
+	t_image		plr_scr;
+}				t_plr;
 
 typedef struct	s_all // структура для всего вместе
 {
 	t_win		*win;
 	t_plr		*plr;
-	char		**map;
-}				  t_all;
+	t_image		img_map;
+	char		**map_arr;
+}				t_all;
 
 typedef	struct		s_tex
 {
