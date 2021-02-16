@@ -2,11 +2,11 @@
 #include <stdio.h>
 
 int main() {
-  int i = -90;
-  while(i++ < 90)
+  double i = 0;
+  while(i < 5)
   {
-    printf("{%d}int i, {%f}\n",i, tan((i*3.14)/180));
-    printf("{%f}{%f}\n", M_PI_4, M_PI_2);
+    printf("{%f} double i, {%f} round i\n",i, round(i));
+    i += 0.1;
   }
   return 0;
 }

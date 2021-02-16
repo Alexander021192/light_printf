@@ -6,12 +6,13 @@
 #    By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/07 11:05:52 by rchallie          #+#    #+#              #
-#    Updated: 2021/01/27 16:20:06 by ocalamar         ###   ########.fr        #
+#    Updated: 2021/02/16 17:13:57 by ocalamar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS1 = mlx.c 			\
+SRCS1 = mlx_mac.c 			\
 		parser_map.c 	\
+		utils.c			\
 
 
 SRCS2 =	parcer.c		\
