@@ -6,13 +6,16 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:02:58 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/24 13:54:31 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/24 17:55:47 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UTILS_H
 # define UTILS_H
 # include "cub.h"
+
+# define MAX(x, y) ((x > y) ? x : y)
+# define ABS(x)	((x > 0) ? x : -x)
 
 char	**ft_read_map(void);
 void	update_screen(t_all *all);
@@ -28,5 +31,7 @@ void	ft_draw_my_pixel(t_all *all, t_point point, t_point pxl_size, int color);
 int		ft_init_player(t_all *all);
 int		ft_draw_map(t_all *all);
 int		ft_draw_player(t_all *all);
+int		ft_draw_back(t_all *all);
+int		load_tex(t_all *all, t_tex *tex, char *path);
 
 #endif

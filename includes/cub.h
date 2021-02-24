@@ -6,15 +6,15 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/24 14:13:51 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/24 17:43:38 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB_H
 # define CUB_H
 
-#define SCALE 16 // условный размер каждого квадратика в карте
-#define SPEED 0.5
+#define MAP_SCALE 0.99 // условный размер карты от основного экрана
+#define SPEED 1
 
 # define KEY_1			18
 # define KEY_2			19
@@ -71,7 +71,21 @@ typedef struct	s_plr //структура для игрока и луча
 
 }				t_plr;
 
-typedef	struct		s_tex
+typedef struct	s_tex
+{
+	char	*path;
+	void	*tex;
+	void	*ptr;
+	t_point	start;
+	t_point	end;
+	int		width;
+	int		height;
+	int		bpp;
+	int		size_line;
+	int		endian;
+}				t_tex;
+
+typedef	struct		s_tex_char
 {
 	char	*resolution;
 	char	*n_textures;
@@ -81,21 +95,25 @@ typedef	struct		s_tex
 	char	*sprt_textures;
 	char	*flr_textures;
 	char	*cl_textures;
-}					t_tex;
+}					t_tex_char;
 
 typedef struct	s_all // структура для всего вместе
 {
 	t_win		win;
 	t_plr		plr;
 	t_image		screen;
-	t_tex		*tex;
+	t_tex_char	*tex_char;
+	t_tex		tex[2];
 	t_point		x_move;
 	t_point		y_move;
 	t_point		rotate;
+	t_point		map_size; // need i?
 	char		**map_arr;
+	int			win_width;
+	int			win_height;
 }				t_all;
 
-t_tex				g_tex;
+t_tex_char				g_tex_char;
 
 char	**ft_read_map(void);
 
