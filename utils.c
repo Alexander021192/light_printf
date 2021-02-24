@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/16 17:30:08 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/24 14:21:51 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,20 +152,20 @@ void	my_mlx_pixel_put(t_image *img, int x, int y, int color)
 	*(unsigned int*)dst = color;
 }
 
-void	ft_draw_my_pixel(t_all *all, t_point point, int color)
+void	ft_draw_my_pixel(t_all *all, t_point point, t_point pxl_size, int color)
 {
 	t_point	end;
 	
-	end.x = (point.x + 1) * SCALE;
-	end.y = (point.y + 1) * SCALE;
-	point.x *= SCALE;
-	point.y *= SCALE;
+	point.x *= pxl_size.x;
+	point.y *= pxl_size.y;
+	end.x = point.x + pxl_size.x;
+	end.y = point.y + pxl_size.y;
 
 	while (point.y < end.y)
 	{
 		while (point.x < end.x)
 			my_mlx_pixel_put(&all->screen, point.x++, point.y, color);
-		point.x -=SCALE;
+		point.x -= pxl_size.x;
 		point.y++;
 	}
 }
@@ -173,26 +173,49 @@ void	ft_draw_my_pixel(t_all *all, t_point point, int color)
 int		ft_init_player(t_all *all)
 {
 	t_plr	plr;
+	t_point	point;
 	
 	ft_bzero(&plr.pos, sizeof(t_point));
+	ft_bzero(&point, sizeof(t_point));
 	ft_bzero(&all->x_move, sizeof(t_point));
 	ft_bzero(&all->y_move, sizeof(t_point));
 	ft_bzero(&all->rotate, sizeof(t_point));
-	plr.pos.x = 0;
-	plr.pos.y = 0;
-	plr.dir = 10;
-	all->plr = plr; 
-	return(0);
+	
+	while(all->map_arr[(int)point.y])
+	{
+		point.x = 0;
+		while (all->map_arr[(int)point.y][(int)point.x])
+		{
+			if(ft_strchr("SWNE", all->map_arr[(int)point.y][(int)point.x]))
+			{
+				plr.pos.x = point.x * SCALE + SCALE/2; //change on pxl_size
+				plr.pos.y = point.y * SCALE + SCALE/2;
+				if(all->map_arr[(int)point.y][(int)point.x] == 'E')
+					plr.dir = 0;
+				else if(all->map_arr[(int)point.y][(int)point.x] == 'S')
+					plr.dir = 180;
+				else if(all->map_arr[(int)point.y][(int)point.x] == 'W')
+					plr.dir = 360;
+				else if (all->map_arr[(int)point.y][(int)point.x] == 'N')
+					plr.dir = 540;
+				all->plr = plr;
+				return (0);
+			}
+			point.x++;
+		}
+		point.y++;
+	}
+	return (1);
 }
 
 int		ft_draw_map(t_all *all)
 {
 
 	t_point		point;
-	t_plr		*plr_pos;
-	
-	plr_pos = &all->plr;
-	printf("{%f}{%f}{%d} in in draw map x y and dir pos\n", plr_pos->pos.x, plr_pos->pos.y, plr_pos->dir);
+	t_point		pxl_size;
+
+	pxl_size.x = 16;
+	pxl_size.y = 16;
 
 	ft_bzero(&point, sizeof(t_point));
 	while(all->map_arr[(int)point.y])
@@ -201,21 +224,7 @@ int		ft_draw_map(t_all *all)
 		while (all->map_arr[(int)point.y][(int)point.x])
 		{
 			if(all->map_arr[(int)point.y][(int)point.x] == '1')
-				ft_draw_my_pixel(all, point, 0xffffff);
-			else if(ft_strchr("SWNE", all->map_arr[(int)point.y][(int)point.x])
-			&& ((int)plr_pos->pos.x == 0 && (int)plr_pos->pos.y == 0))
-			{
-				plr_pos->pos.x = point.x * SCALE + SCALE/2;
-				plr_pos->pos.y = point.y * SCALE + SCALE/2;
-				if(all->map_arr[(int)point.y][(int)point.x] == 'E')
-					plr_pos->dir = 0;
-				else if(all->map_arr[(int)point.y][(int)point.x] == 'S')
-					plr_pos->dir = 180;
-				else if(all->map_arr[(int)point.y][(int)point.x] == 'W')
-					plr_pos->dir = 360;
-				else if (all->map_arr[(int)point.y][(int)point.x] == 'N')
-					plr_pos->dir = 540;
-			}
+				ft_draw_my_pixel(all, point, pxl_size, 0xffffff);
 			point.x++;
 		}
 		point.y++;
@@ -226,22 +235,25 @@ int		ft_draw_map(t_all *all)
 int		ft_draw_player(t_all *all)
 {
 	t_plr	*plr;
-	double	start;
 	t_point	pos;
+	double	angle;
+	double	len_ray;
 
 	plr = &all->plr;
-	start = plr->dir - 60;
-	while(start < plr->dir + 60)
+	angle = plr->dir - 60;
+	while(angle < plr->dir + 60)
 	{
+		len_ray = 0;
 		pos.x = plr->pos.x;
 		pos.y = plr->pos.y;
-		while(all->map_arr[(int)pos.y/SCALE][(int)pos.x/SCALE] != '1')
+		while(all->map_arr[(int)pos.y / SCALE][(int)pos.x / SCALE] != '1')
 		{
-			pos.x += cos(start * M_PI_2/180);
-			pos.y += sin(start * M_PI_2/180);
+			pos.x = plr->pos.x + len_ray * cos(angle * M_PI_2/180);
+			pos.y = plr->pos.y + len_ray * sin(angle * M_PI_2/180);
 			my_mlx_pixel_put(&all->screen, pos.x, pos.y, 0x80ff00);
+			len_ray += 1;
 		}
-		start += 0.5;
+		angle += 0.5;
 	}
 	return(0);
 }

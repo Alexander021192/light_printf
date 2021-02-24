@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:02:58 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/16 16:48:57 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/24 13:54:31 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int		rotate_camera(t_all *all, int flag);
 int		main_loop(t_all *all);
 void	set_pos(t_point *pos, double x, double y);
 void	my_mlx_pixel_put(t_image *img, int x, int y, int color);
-void	ft_draw_my_pixel(t_all *all, t_point point, int color);
+void	ft_draw_my_pixel(t_all *all, t_point point, t_point pxl_size, int color);
 int		ft_init_player(t_all *all);
 int		ft_draw_map(t_all *all);
 int		ft_draw_player(t_all *all);
