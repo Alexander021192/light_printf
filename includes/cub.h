@@ -6,14 +6,14 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/24 17:43:38 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/27 15:45:58 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB_H
 # define CUB_H
 
-#define MAP_SCALE 0.99 // условный размер карты от основного экрана
+#define MAP_SCALE 1 // условный размер карты от основного экрана
 #define SPEED 1
 
 # define KEY_1			18
@@ -71,6 +71,22 @@ typedef struct	s_plr //структура для игрока и луча
 
 }				t_plr;
 
+typedef struct s_ray
+{
+	double	dir;
+	double	len_ray;
+	int		num_ray;
+	t_point	pos;
+}				t_ray;
+
+typedef struct	s_sprite
+{
+	t_point	pos;
+	double	distance;
+	int		num_ray;
+}				t_sprite;
+
+
 typedef struct	s_tex
 {
 	char	*path;
@@ -103,7 +119,7 @@ typedef struct	s_all // структура для всего вместе
 	t_plr		plr;
 	t_image		screen;
 	t_tex_char	*tex_char;
-	t_tex		tex[2];
+	t_tex		tex[5];
 	t_point		x_move;
 	t_point		y_move;
 	t_point		rotate;

@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/24 19:48:12 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/27 16:40:39 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ int		x_update_pos(t_all *all, int flag)
 
 int		rotate_camera(t_all *all, int flag)
 {
-	all->plr.dir = all->plr.dir % 720 + flag * 2;
+	all->plr.dir = (all->plr.dir + 720) % 720 + flag * 2;
 	return (1);
 }
 
@@ -276,39 +276,119 @@ int		ft_draw_back(t_all *all)
 	return (0);
 }
 
-int		ft_draw_wall(t_all *all, double angle, double len_ray, int num_ray, t_point pos_ray) //создать структуру ray
+int		ft_draw_wall(t_all *all, t_ray ray) 
 {
-	int		column_height;
+	double		column_height;
 	t_point	pos;
-			
-	len_ray = (len_ray * cos((angle - all->plr.dir) * M_PI_2/180)) / all->map_size.y; 
-	len_ray = (len_ray < 1) ? 1 : len_ray;
-	column_height = (int)(all->win_height/(len_ray));
 
-	pos.x = num_ray;
-	pos.y = all->win_height/2 - column_height/2;
+	ray.dir = ((int)ray.dir + 720) % 720;
+			
+	ray.len_ray = (ray.len_ray * cos((ray.dir - all->plr.dir) * M_PI_2/180)) / all->map_size.y;
+	column_height = (all->win_height/ray.len_ray);
+
+
 
 	int		x_texcoord;
 	int		y_texcoord;
+
+	
+	//----------func get x_texcoord ----------//
 	double	hitx, hity;
+	hity = ray.pos.y/all->map_size.y - (int)(ray.pos.y/all->map_size.y + 0.5);
+	hitx = ray.pos.x/all->map_size.x - (int)(ray.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
 
-	hitx = pos_ray.x/all->map_size.x - (int)(pos_ray.x/all->map_size.x);
-	hity = pos_ray.y/all->map_size.y - (int)(pos_ray.y/all->map_size.y);
+	//-----------//func get number tex-------------
+	int num_tex = 0;
+	
+	if(ABS(hity) > ABS(hitx))
+	{
+		if(ray.dir > 180 && ray.dir < 540)
+			num_tex = 3;
+		else
+			num_tex = 1;
+	}
+	else if(ABS(hity) < ABS(hitx))
+	{
+		//printf("{%f ray dir}\n", ray.dir);
+		if(ray.dir > 0 && ray.dir < 360)
+			num_tex = 2;
+		else
+			num_tex = 0;
+	}
 
-	x_texcoord = MAX(ABS(hitx), ABS(hity)) * all->tex->width;
+	x_texcoord = MAX(ABS(hity), ABS(hitx)) * all->tex->width;
+	
+	// -----------------------------//
 	y_texcoord = 0;
+	pos.x = ray.num_ray;
+	pos.y = (all->win_height/2 - column_height/2);
 	//printf("{%d} texcoord\n", x_texcoord);
 	//printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
 
-	int i = 0;
-	printf("{%d column}\n", column_height);
+	int i = (column_height > all->win_height) ? (int)(-pos.y) : 0;
+	pos.y = (pos.y < 0) ? 0 : pos.y;
+	//printf("{%d column %f pos.y {%d - i} \n", column_height, pos.y, i);
+	 
 	while(i < column_height)
 	{
-		my_mlx_pixel_put(&all->screen, pos.x, pos.y, 
-			get_tex_color(&all->tex[0], x_texcoord, y_texcoord++));
 		y_texcoord = (i++ * 64) / column_height;
-		
-		y_texcoord %= 64;
+		if(pos.y > 0 && pos.y < all->win_height)  // есть момент с тем, лишниими циклами при высоких стенах
+			my_mlx_pixel_put(&all->screen, pos.x, pos.y, 
+				get_tex_color(&all->tex[num_tex], x_texcoord, y_texcoord));
+		else if(pos.y > all->win_height)
+			break;
+	
+		pos.y++;
+
+	}
+
+	return(0);
+}
+
+int		ft_draw_sprite(t_all *all, t_sprite sprite)
+{
+	double	sprite_height;
+	t_point	pos;
+
+	//ray.dir = ((int)ray.dir + 720) % 720;
+			
+	sprite.distance = (sprite.distance) / all->map_size.y; // * cos((ray.dir - all->plr.dir) * M_PI_2/180))
+	sprite_height = (all->win_height/sprite.distance);
+
+
+
+	int		x_texcoord;
+	int		y_texcoord;
+	int		color;
+
+	
+	//----------func get x_texcoord ----------//
+	// double	hitx, hity;
+	// hity = sprite.pos.y/all->map_size.y - (int)(sprite.pos.y/all->map_size.y + 0.5);
+	// hitx = sprite.pos.x/all->map_size.x - (int)(sprite.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
+
+	// x_texcoord = ABS(hitx) * all->tex->width;
+	x_texcoord = 0;
+	// -----------------------------//
+	y_texcoord = 0;
+	pos.x = sprite.num_ray;
+	pos.y = (all->win_height/2 - sprite_height/2);
+	//printf("{%d} texcoord\n", x_texcoord);
+	//printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
+
+	int i = (sprite_height > all->win_height) ? (int)(-pos.y) : 0;
+	pos.y = (pos.y < 0) ? 0 : pos.y;
+	//printf("{%d column %f pos.y {%d - i} \n", column_height, pos.y, i);
+	 
+	while(i < sprite_height)
+	{
+		color = get_tex_color(&all->tex[4], x_texcoord, y_texcoord);
+		y_texcoord = (i++ * 64) / sprite_height;
+		if(pos.y > 0 && pos.y < all->win_height && color != 0)  // есть момент с тем, лишниими циклами при высоких стенах
+			my_mlx_pixel_put(&all->screen, pos.x, pos.y, color);
+		else if(pos.y > all->win_height)
+			break;
+	
 		pos.y++;
 
 	}
@@ -318,48 +398,43 @@ int		ft_draw_wall(t_all *all, double angle, double len_ray, int num_ray, t_point
 
 int		ft_draw_player(t_all *all) 
 {
-	t_plr	*plr;
-	t_point	pos;
-	double	angle;
-	double	len_ray;
-	int		num_ray;
-
-	num_ray  = 0;
+	t_plr		*plr;
+	t_ray		ray;
+	t_sprite	sprite;
+	
+	sprite.distance = -1.;
+	ray.num_ray  = 0;
 	plr = &all->plr;
-	angle = plr->dir - 60;
-	while(angle < plr->dir + 60)
+	//printf("{%d}plr dir\n", plr->dir);
+	ray.dir = plr->dir - 60;
+	while(ray.dir < plr->dir + 60)
 	{
-		len_ray = 0;
-		pos.x = plr->pos.x;
-		pos.y = plr->pos.y;
-		while(all->map_arr[(int)pos.y / (int)all->map_size.y][(int)pos.x / (int)all->map_size.x] != '1')
+		ray.len_ray = 0;
+		ray.pos.x = plr->pos.x;
+		ray.pos.y = plr->pos.y;
+		while(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] != '1')
 		{
-			pos.x = plr->pos.x + len_ray * cos(angle * M_PI_2/180);
-			pos.y = plr->pos.y + len_ray * sin(angle * M_PI_2/180);
-			//my_mlx_pixel_put(&all->screen, pos.x, pos.y, 0x80ff00);
-			len_ray += 1;
+			if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '2')
+			{
+				sprite.pos.x = ray.pos.x;
+				sprite.pos.y = ray.pos.y;
+				sprite.distance = ray.len_ray;
+				sprite.num_ray = ray.num_ray;
+			}
+			ray.pos.x = plr->pos.x + ray.len_ray * cos(ray.dir * M_PI_2/180);
+			ray.pos.y = plr->pos.y + ray.len_ray * sin(ray.dir * M_PI_2/180);
+			//my_mlx_pixel_put(&all->screen, ray.pos.x, ray.pos.y, 0x80ff00);
+			ray.len_ray += 1; //именно из за этого шага у меня полоса с краев стен!!! изменить систему шага
 		}
-		if(all->map_arr[(int)pos.y / (int)all->map_size.y][(int)pos.x / (int)all->map_size.x] == '1')
-			ft_draw_wall(all, angle, len_ray, num_ray, pos);
-
-		num_ray++;
-		angle += 120. / all->win_width;
+		if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '1')
+			ft_draw_wall(all, ray);
+		ray.num_ray++;
+		ray.dir += 120. / all->win_width;
 	}
+
+	if(sprite.distance > 0) // будем рисовать спрайты после пускания лучей!))) 
+		//printf("{%f x}{%f y}{%f dist}{%d numray}\n", sprite.pos.x, sprite.pos.y, sprite.distance, sprite.num_ray);
+		ft_draw_sprite(all, sprite);
 	return(0);
 }
 
-// void	update_screen(t_all *all)
-// {
-// 	all->screen->img = mlx_new_image(all->win->ptr, 640, 480);
-// 	all->screen->addr = mlx_get_data_addr(all->screen->img, &all->screen->bpp,
-// 	&all->screen->line_len, &all->screen->endian);
-	
-// 	ft_draw_map(all);
-	
-	
-	
-// 	ft_draw_player(all);
-	
-// 	mlx_put_image_to_window(all->win->ptr, all->win->win, all->screen->img, 0, 0);
-// 	mlx_destroy_image(all->win->ptr, all->screen->img);
-// }

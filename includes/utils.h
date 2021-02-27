@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:02:58 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/24 17:55:47 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/27 15:39:50 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 
 # define MAX(x, y) ((x > y) ? x : y)
 # define ABS(x)	((x > 0) ? x : -x)
+
+// необходимо записать эту строку короче all->map_arr[(int)pos.y / (int)all->map_size.y][(int)pos.x / (int)all->map_size.x] != '1'
 
 char	**ft_read_map(void);
 void	update_screen(t_all *all);
@@ -33,5 +35,6 @@ int		ft_draw_map(t_all *all);
 int		ft_draw_player(t_all *all);
 int		ft_draw_back(t_all *all);
 int		load_tex(t_all *all, t_tex *tex, char *path);
+int		ft_draw_sprite(t_all *all, t_sprite sprite);
 
 #endif

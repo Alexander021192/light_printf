@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 11:40:26 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/24 18:17:30 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/02/27 16:10:01 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ int		ft_init_config(t_all *all)
 {
 	// парсим ширину высоту экрана//
 
-	all->win_height = 600;
-	all->win_width = 800;
+	all->win_height = 768;
+	all->win_width = 1024;
 	
 	all->map_size.x = (int)((all->win_width / all->map_size.x) * MAP_SCALE);
 	all->map_size.y = (int)((all->win_height / all->map_size.y) * MAP_SCALE);
@@ -70,12 +70,29 @@ int		ft_init_config(t_all *all)
 int		ft_init_textures(t_all *all)
 {
 	//t_tex	*tex;
-	char	*path = "./eagle.xpm";
+	char	*path0 = "./eagle.xpm";
+	char	*path1 = "./bluestone.xpm";
+	char	*path2 = "./wall_1.xpm";
+	char	*path3 = "./wall_4.xpm";
+	char	*path4 = "./sprite_1.xpm";
+	
 
 	//printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
 
 	all->tex[0].tex = mlx_xpm_file_to_image(all->win.ptr, "./eagle.xpm", &all->tex[0].width, &all->tex[0].height);
 	all->tex[0].ptr = mlx_get_data_addr(all->tex[0].tex, &all->tex[0].bpp, &all->tex[0].size_line, &all->tex[0].endian);
+
+	all->tex[1].tex = mlx_xpm_file_to_image(all->win.ptr, "./bluestone.xpm", &all->tex[1].width, &all->tex[1].height);
+	all->tex[1].ptr = mlx_get_data_addr(all->tex[1].tex, &all->tex[1].bpp, &all->tex[1].size_line, &all->tex[1].endian);
+
+	all->tex[2].tex = mlx_xpm_file_to_image(all->win.ptr, "./wall_1.xpm", &all->tex[2].width, &all->tex[2].height);
+	all->tex[2].ptr = mlx_get_data_addr(all->tex[2].tex, &all->tex[2].bpp, &all->tex[2].size_line, &all->tex[2].endian);
+
+	all->tex[3].tex = mlx_xpm_file_to_image(all->win.ptr, "./wall_4.xpm", &all->tex[3].width, &all->tex[3].height);
+	all->tex[3].ptr = mlx_get_data_addr(all->tex[3].tex, &all->tex[3].bpp, &all->tex[3].size_line, &all->tex[3].endian);
+
+	all->tex[4].tex = mlx_xpm_file_to_image(all->win.ptr, "./sprite_1.xpm", &all->tex[4].width, &all->tex[4].height);
+	all->tex[4].ptr = mlx_get_data_addr(all->tex[4].tex, &all->tex[4].bpp, &all->tex[4].size_line, &all->tex[4].endian);
 	// printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
 	return (0);
 }
