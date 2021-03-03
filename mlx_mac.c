@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 11:40:26 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/27 16:10:01 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/03 11:27:13 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ int		ft_init_textures(t_all *all)
 	// printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
 	return (0);
 }
+
 int		main(void)
 {
 	//принты для проверок

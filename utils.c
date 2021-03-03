@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/27 16:40:39 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/03 15:29:53 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,52 +347,41 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 
 int		ft_draw_sprite(t_all *all, t_sprite sprite)
 {
-	double	sprite_height;
-	t_point	pos;
-
-	//ray.dir = ((int)ray.dir + 720) % 720;
-			
-	sprite.distance = (sprite.distance) / all->map_size.y; // * cos((ray.dir - all->plr.dir) * M_PI_2/180))
-	sprite_height = (all->win_height/sprite.distance);
-
-
-
-	int		x_texcoord;
-	int		y_texcoord;
-	int		color;
-
+	t_point plr_pos;
 	
-	//----------func get x_texcoord ----------//
-	// double	hitx, hity;
-	// hity = sprite.pos.y/all->map_size.y - (int)(sprite.pos.y/all->map_size.y + 0.5);
-	// hitx = sprite.pos.x/all->map_size.x - (int)(sprite.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
+	plr_pos.x = (int)(all->plr.pos.x / all->map_size.x);
+	plr_pos.y = (int)(all->plr.pos.y / all->map_size.y);
 
-	// x_texcoord = ABS(hitx) * all->tex->width;
-	x_texcoord = 0;
-	// -----------------------------//
-	y_texcoord = 0;
-	pos.x = sprite.num_ray;
-	pos.y = (all->win_height/2 - sprite_height/2);
-	//printf("{%d} texcoord\n", x_texcoord);
-	//printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
+	printf("sprite coord {%.2f}{%.2f}\n", sprite.pos.x, sprite.pos.y);
+	printf("plr coord {%.2f}{%.2f}\n", plr_pos.x, plr_pos.y);
+	double	sprite_dir = atan2(sprite.pos.y - plr_pos.y, sprite.pos.x - plr_pos.x) * 180/M_PI_2;
+	sprite_dir = (int)(sprite_dir + 720) % 720;
+	double	sprite_dist = sqrt(pow(plr_pos.x - sprite.pos.x, 2) + pow(plr_pos.y - sprite.pos.y, 2));
+	int	sprite_size = all->win_height / sprite_dist;
+	printf("sprite dir {%.2f} and dist {%.2f}\n", sprite_dir, sprite_dist);
+	int	h_offset = (sprite_dir - all->plr.dir) / 120 * all->win_width + all->win_width/2 - 64/2;
+	int	v_offset = all->win_height / 2 - sprite_size/2;
+	
+	printf("{%d}{%d} offset  \n", h_offset, v_offset);
 
-	int i = (sprite_height > all->win_height) ? (int)(-pos.y) : 0;
-	pos.y = (pos.y < 0) ? 0 : pos.y;
-	//printf("{%d column %f pos.y {%d - i} \n", column_height, pos.y, i);
-	 
-	while(i < sprite_height)
+	int i = -1, j = -1;
+
+	while (i++ < sprite_size)
 	{
-		color = get_tex_color(&all->tex[4], x_texcoord, y_texcoord);
-		y_texcoord = (i++ * 64) / sprite_height;
-		if(pos.y > 0 && pos.y < all->win_height && color != 0)  // есть момент с тем, лишниими циклами при высоких стенах
-			my_mlx_pixel_put(&all->screen, pos.x, pos.y, color);
-		else if(pos.y > all->win_height)
-			break;
-	
-		pos.y++;
-
+		if(h_offset+i < 0 || h_offset + i >= all->win_width)
+			continue;
+		while (j++ < sprite_size)
+		{
+			if(v_offset+j < 0 || v_offset + j >= all->win_height)
+				continue;
+			int color = get_tex_color(&all->tex[4], i*64/sprite_size, j*64/sprite_size);
+			if(color)
+				my_mlx_pixel_put(&all->screen, all->win_width + h_offset + i, v_offset + j, color);
+		}
+		j = -1;
+		
 	}
-
+	
 	return(0);
 }
 
@@ -416,10 +405,8 @@ int		ft_draw_player(t_all *all)
 		{
 			if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '2')
 			{
-				sprite.pos.x = ray.pos.x;
-				sprite.pos.y = ray.pos.y;
-				sprite.distance = ray.len_ray;
-				sprite.num_ray = ray.num_ray;
+				sprite.pos.x = (int)(ray.pos.x / all->map_size.x);
+				sprite.pos.y = (int)(ray.pos.y / all->map_size.y);
 			}
 			ray.pos.x = plr->pos.x + ray.len_ray * cos(ray.dir * M_PI_2/180);
 			ray.pos.y = plr->pos.y + ray.len_ray * sin(ray.dir * M_PI_2/180);
@@ -432,9 +419,11 @@ int		ft_draw_player(t_all *all)
 		ray.dir += 120. / all->win_width;
 	}
 
-	if(sprite.distance > 0) // будем рисовать спрайты после пускания лучей!))) 
-		//printf("{%f x}{%f y}{%f dist}{%d numray}\n", sprite.pos.x, sprite.pos.y, sprite.distance, sprite.num_ray);
-		ft_draw_sprite(all, sprite);
+	if((int)sprite.pos.y != 0 ) // будем рисовать спрайты после пускания лучей!))) 
+		{
+			//printf("{%f x}{%f y}{%f dist}{%d numray}\n", sprite.pos.x, sprite.pos.y, sprite.distance, sprite.num_ray);
+			ft_draw_sprite(all, sprite);
+		}
 	return(0);
 }
 
