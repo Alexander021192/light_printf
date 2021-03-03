@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:02:58 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/02/27 15:39:50 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/03 21:25:40 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ int		ft_draw_map(t_all *all);
 int		ft_draw_player(t_all *all);
 int		ft_draw_back(t_all *all);
 int		load_tex(t_all *all, t_tex *tex, char *path);
-int		ft_draw_sprite(t_all *all, t_sprite sprite);
+int		ft_draw_sprite(t_all *all, t_sprite sprite, double arr_len_ray[]);
+t_list	*ft_sort_list( t_list *root );
 
 #endif

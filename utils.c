@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/03 15:29:53 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/03 21:24:55 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,39 @@
 #include "./includes/utils.h"
 
 #include <stdio.h>
+
+
+t_list *ft_sort_list( t_list *root )
+{
+    t_list *new_root = NULL;
+	t_list *current;
+	t_list *node;
+
+    while ( root != NULL )
+    {
+        node = root;
+        root = root->next;
+
+        if ( new_root == NULL || *((int*)node->content) > *((int*)new_root->content) )
+        {
+            node->next = new_root;
+            new_root = node;
+        }
+        else
+        {
+			current = new_root;
+			while ( current->next != NULL && !( *((int*)node->content) > *((int*)current->content)))
+			{
+				current = current->next;
+			}
+
+            node->next = current->next;
+            current->next = node;
+        }
+    }
+
+    return new_root;
+}
 
 int		get_tex_color(t_tex *tex, int x, int y)
 {
@@ -283,7 +316,7 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 
 	ray.dir = ((int)ray.dir + 720) % 720;
 			
-	ray.len_ray = (ray.len_ray * cos((ray.dir - all->plr.dir) * M_PI_2/180)) / all->map_size.y;
+	ray.len_ray = (ray.len_ray ) / all->map_size.y * cos((ray.dir - all->plr.dir) * (M_PI_2)/180);
 	column_height = (all->win_height/ray.len_ray);
 
 
@@ -345,24 +378,30 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	return(0);
 }
 
-int		ft_draw_sprite(t_all *all, t_sprite sprite)
+int		ft_draw_sprite(t_all *all, t_sprite sprite, double arr_len_ray[])
 {
 	t_point plr_pos;
 	
-	plr_pos.x = (int)(all->plr.pos.x / all->map_size.x);
-	plr_pos.y = (int)(all->plr.pos.y / all->map_size.y);
+	plr_pos.x = (all->plr.pos.x / all->map_size.x);
+	plr_pos.y = (all->plr.pos.y / all->map_size.y);
 
-	printf("sprite coord {%.2f}{%.2f}\n", sprite.pos.x, sprite.pos.y);
-	printf("plr coord {%.2f}{%.2f}\n", plr_pos.x, plr_pos.y);
+
+
+	// printf("sprite coord {%.2f}{%.2f}\n", sprite.pos.x, sprite.pos.y);
+	// printf("plr coord {%.2f}{%.2f}\n", plr_pos.x, plr_pos.y);
 	double	sprite_dir = atan2(sprite.pos.y - plr_pos.y, sprite.pos.x - plr_pos.x) * 180/M_PI_2;
 	sprite_dir = (int)(sprite_dir + 720) % 720;
 	double	sprite_dist = sqrt(pow(plr_pos.x - sprite.pos.x, 2) + pow(plr_pos.y - sprite.pos.y, 2));
+	sprite_dist *= cos((sprite_dir - all->plr.dir) * M_PI_2/180);
+	// printf("sprite dist{%.3f}\n", sprite_dist * cos((sprite_dir - all->plr.dir) * M_PI/180));
+	// printf("sprite dist{%.3f}\n", sprite_dist);
 	int	sprite_size = all->win_height / sprite_dist;
-	printf("sprite dir {%.2f} and dist {%.2f}\n", sprite_dir, sprite_dist);
-	int	h_offset = (sprite_dir - all->plr.dir) / 120 * all->win_width + all->win_width/2 - 64/2;
-	int	v_offset = all->win_height / 2 - sprite_size/2;
+	//printf("sprite dir {%.2f} and dist {%.2f}\n", sprite_dir, sprite_dist);
 	
-	printf("{%d}{%d} offset  \n", h_offset, v_offset);
+	int		h_offset = (sprite_dir - all->plr.dir) / 120 * all->win_width + all->win_width/2 - 64/2;
+	int		v_offset = all->win_height / 2 - sprite_size/2;
+	
+	//printf("{%.2f}{%.2f} offset  \n", h_offset, v_offset);
 
 	int i = -1, j = -1;
 
@@ -370,7 +409,10 @@ int		ft_draw_sprite(t_all *all, t_sprite sprite)
 	{
 		if(h_offset+i < 0 || h_offset + i >= all->win_width)
 			continue;
-		while (j++ < sprite_size)
+		printf("{%.2f ray len {%d}}{%.2f sprdist}\n", arr_len_ray[h_offset+i], h_offset+i ,sprite_dist);
+		if(arr_len_ray[h_offset+i] < sprite_dist)
+			continue;
+		while (j++ < sprite_size - 2)
 		{
 			if(v_offset+j < 0 || v_offset + j >= all->win_height)
 				continue;
@@ -390,6 +432,7 @@ int		ft_draw_player(t_all *all)
 	t_plr		*plr;
 	t_ray		ray;
 	t_sprite	sprite;
+	double		arr_len_ray[all->win_width];
 	
 	sprite.distance = -1.;
 	ray.num_ray  = 0;
@@ -405,8 +448,8 @@ int		ft_draw_player(t_all *all)
 		{
 			if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '2')
 			{
-				sprite.pos.x = (int)(ray.pos.x / all->map_size.x);
-				sprite.pos.y = (int)(ray.pos.y / all->map_size.y);
+				sprite.pos.x = (int)(ray.pos.x / all->map_size.x) + 0.22;
+				sprite.pos.y = (int)(ray.pos.y / all->map_size.y) + 0.22;
 			}
 			ray.pos.x = plr->pos.x + ray.len_ray * cos(ray.dir * M_PI_2/180);
 			ray.pos.y = plr->pos.y + ray.len_ray * sin(ray.dir * M_PI_2/180);
@@ -414,15 +457,18 @@ int		ft_draw_player(t_all *all)
 			ray.len_ray += 1; //именно из за этого шага у меня полоса с краев стен!!! изменить систему шага
 		}
 		if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '1')
+		{
+			arr_len_ray[ray.num_ray] = sqrt(pow((plr->pos.x - ray.pos.x)/all->map_size.x, 2) + pow((plr->pos.y - ray.pos.y)/all->map_size.y, 2));
+;
 			ft_draw_wall(all, ray);
+		}
 		ray.num_ray++;
 		ray.dir += 120. / all->win_width;
 	}
-
 	if((int)sprite.pos.y != 0 ) // будем рисовать спрайты после пускания лучей!))) 
 		{
 			//printf("{%f x}{%f y}{%f dist}{%d numray}\n", sprite.pos.x, sprite.pos.y, sprite.distance, sprite.num_ray);
-			ft_draw_sprite(all, sprite);
+			ft_draw_sprite(all, sprite, arr_len_ray);
 		}
 	return(0);
 }
