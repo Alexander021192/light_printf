@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/04 18:57:52 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/04 19:34:26 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,8 +356,8 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	t_point	pos;
 
 	ray.dir = ((int)ray.dir + 720) % 720;
-			
-	ray.len_ray = (ray.len_ray ) / all->map_size.y * cos((ray.dir - all->plr.dir) * (M_PI_2)/180);
+	//printf("{%f} ray.len  \n", ray.len_ray);	
+	//ray.len_ray = (ray.len_ray ) / all->map_size.y * cos((ray.dir - all->plr.dir) * (M_PI_2)/180);
 	column_height = (all->win_height/ray.len_ray);
 
 
@@ -367,21 +367,25 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 
 	
 	//----------func get x_texcoord ----------//
-	double	hitx, hity;
-	hity = ray.pos.y/all->map_size.y - (int)(ray.pos.y/all->map_size.y + 0.5);
-	hitx = ray.pos.x/all->map_size.x - (int)(ray.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
-
+	double	hitx;
+	if(ray.side == 0)
+		hitx = all->plr.pos.x / all->map_size.x + ray.len_ray * ABS(cos(ray.dir * M_PI_2 / 180));
+	else
+		hitx = all->plr.pos.y / all->map_size.y + ray.len_ray * ABS(sin(ray.dir * M_PI_2 / 180));
+	// hity = ray.pos.y/all->map_size.y - (int)(ray.pos.y/all->map_size.y + 0.5);
+	// hitx = ray.pos.x/all->map_size.x - (int)(ray.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
+	hitx -= (int)hitx;
 	//-----------//func get number tex-------------
 	int num_tex = 0;
 	
-	if(ABS(hity) > ABS(hitx))
+	if(ray.side == 1)
 	{
 		if(ray.dir > 180 && ray.dir < 540)
 			num_tex = 3;
 		else
 			num_tex = 1;
 	}
-	else if(ABS(hity) < ABS(hitx))
+	else
 	{
 		//printf("{%f ray dir}\n", ray.dir);
 		if(ray.dir > 0 && ray.dir < 360)
@@ -390,8 +394,8 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 			num_tex = 0;
 	}
 
-	x_texcoord = MAX(ABS(hity), ABS(hitx)) * all->tex->width;
-	
+	x_texcoord = hitx * all->tex->width;
+	printf("{%f}hit  {%d} x textcoord{%f} column hight\n", hitx, x_texcoord, column_height);
 	// -----------------------------//
 	y_texcoord = 0;
 	pos.x = ray.num_ray;
@@ -533,13 +537,14 @@ void	ft_dda_step(t_ray *ray)
 
 double	ft_get_len_ray(t_all *all, t_ray *ray)
 {
+	
 	double len_ray = 0;
 	if (ray->side == 0)
-		len_ray = (ray->pos.x - all->plr.pos.x + (1 - ray->step.x) / 2) 
-		/ cos(ray->dir * M_PI_2/180);
+		len_ray = (ray->pos.x - all->plr.pos.x / all->map_size.x + (1 - ray->step.x) / 2) 
+		/ ABS(cos(ray->dir * M_PI_2/180));
 	else
-		len_ray = (ray->pos.y - all->plr.pos.y + (1 - ray->step.y) / 2) 
-		/ sin(ray->dir * M_PI_2/180);
+		len_ray = (ray->pos.y - all->plr.pos.y / all->map_size.y + (1 - ray->step.y) / 2) 
+		/ ABS(sin(ray->dir * M_PI_2/180));
 	ray->len_ray = len_ray;
 	return (len_ray);
 }
@@ -559,9 +564,9 @@ int		ft_draw_player(t_all *all)
 	while(ray.dir < plr->dir + 60)
 	{
 		ft_init_ray(all, &ray);
-		ray.len_ray = 0;
-		ray.pos.x = plr->pos.x;
-		ray.pos.y = plr->pos.y;
+		// ray.len_ray = 0;
+		// ray.pos.x = plr->pos.x;
+		// ray.pos.y = plr->pos.y;
 		while(all->map_arr[(int)ray.pos.y][(int)ray.pos.x] != '1')
 		{
 			ft_dda_step(&ray);
@@ -609,7 +614,7 @@ int		ft_draw_player(t_all *all)
 	}
 	if(sprites)
 	{
-		ft_draw_sprites(all, ft_sort_list(sprites), arr_len_ray);
+		//ft_draw_sprites(all, ft_sort_list(sprites), arr_len_ray);
 		ft_reset_pos_sprites(&sprites, all);// и тут же можно очистить sprites
 	}
 	return(0);
