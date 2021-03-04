@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/04 15:13:11 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/04 18:35:04 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,10 @@ typedef struct s_ray
 	double	dir;
 	double	len_ray;
 	int		num_ray;
+	int		side;
+	t_point	side_dist;
+	t_point	delta_dist;
+	t_point	step;
 	t_point	pos;
 }				t_ray;
 

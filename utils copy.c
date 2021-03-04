@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/04 18:57:52 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/04 17:34:20 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -466,84 +466,6 @@ int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 	return(0);
 }
 
-int		ft_init_ray(t_all *all, t_ray *ray)
-{ // поделить функцию пополам
-	t_point plr_pos;
-
-	plr_pos.x = all->plr.pos.x / all->map_size.x;
-	plr_pos.y = all->plr.pos.y / all->map_size.y;
-
-	ray->pos.x = (int)plr_pos.x;
-	ray->pos.y = (int)plr_pos.y;
-	
-	printf("{%.f}{%.f}\n", plr_pos.x , plr_pos.y);
-	
-	if(sin(ray->dir * M_PI_2/180) == 0)
-		ray->delta_dist.x = 0;
-	else if(cos((ray->dir * M_PI_2/180) == 0))
-		ray->delta_dist.x = 1;
-	else
-		ray->delta_dist.x = ABS(1 / cos(ray->dir * M_PI_2/180));
-	
-	if(cos(ray->dir * M_PI_2/180) == 0)
-		ray->delta_dist.y = 0;
-	else if(sin((ray->dir * M_PI_2/180) == 0))
-		ray->delta_dist.y = 1;
-	else
-		ray->delta_dist.y = ABS(1 / sin(ray->dir * M_PI_2/180));
-
-	if(cos(ray->dir * M_PI_2/180) < 0)
-	{
-		ray->step.x = -1;
-		ray->side_dist.x = (plr_pos.x - (int)plr_pos.x) * ray->delta_dist.x;
-	}
-	else
-	{
-		ray->step.x = 1;
-		ray->side_dist.x = (1.0 - (plr_pos.x - (int)plr_pos.x)) * ray->delta_dist.x;
-	}
-	if (sin(ray->dir * M_PI_2/180) < 0)
-	{
-		ray->step.y = -1;
-		ray->side_dist.y = (plr_pos.y - (int)plr_pos.y) * ray->delta_dist.y;
-	}
-	else
-	{
-		ray->step.y = 1;
-		ray->side_dist.y = (1.0 - (plr_pos.y - (int)plr_pos.y)) * ray->delta_dist.y;
-	}
-	return (0);
-}
-
-void	ft_dda_step(t_ray *ray)
-{
-	if(ray->side_dist.x < ray->side_dist.y)
-	{
-		ray->side_dist.x += ray->delta_dist.x;
-		ray->pos.x += ray->step.x;
-		ray->side = 0;
-	}
-	else
-	{
-		ray->side_dist.y += ray->delta_dist.y;
-		ray->pos.y += ray->step.y;
-		ray->side = 1;
-	}
-}
-
-double	ft_get_len_ray(t_all *all, t_ray *ray)
-{
-	double len_ray = 0;
-	if (ray->side == 0)
-		len_ray = (ray->pos.x - all->plr.pos.x + (1 - ray->step.x) / 2) 
-		/ cos(ray->dir * M_PI_2/180);
-	else
-		len_ray = (ray->pos.y - all->plr.pos.y + (1 - ray->step.y) / 2) 
-		/ sin(ray->dir * M_PI_2/180);
-	ray->len_ray = len_ray;
-	return (len_ray);
-}
-
 int		ft_draw_player(t_all *all) 
 {
 	t_plr		*plr;
@@ -558,24 +480,9 @@ int		ft_draw_player(t_all *all)
 	ray.dir = plr->dir - 60;
 	while(ray.dir < plr->dir + 60)
 	{
-		ft_init_ray(all, &ray);
 		ray.len_ray = 0;
 		ray.pos.x = plr->pos.x;
 		ray.pos.y = plr->pos.y;
-		while(all->map_arr[(int)ray.pos.y][(int)ray.pos.x] != '1')
-		{
-			ft_dda_step(&ray);
-			if (all->map_arr[(int)ray.pos.y][(int)ray.pos.x] == '2')
-				add_front_sprite(&sprites, all, ray);
-		}
-		if(all->map_arr[(int)ray.pos.y][(int)ray.pos.x] == '1')
-		{
-			arr_len_ray[ray.num_ray] = ft_get_len_ray(all, &ray);
-			ft_draw_wall(all, ray);
-		}
-		
-		//--------------------------------------// как будто вот это заменяем
-		
 		while(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] != '1')
 		{
 			if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '2')
@@ -600,10 +507,6 @@ int		ft_draw_player(t_all *all)
 ;
 			ft_draw_wall(all, ray);
 		}
-		
-		// ---------------------------//
-
-		
 		ray.num_ray++;
 		ray.dir += 120. / all->win_width;
 	}
