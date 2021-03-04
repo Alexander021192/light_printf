@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/03 21:24:55 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/04 17:21:57 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,36 +18,77 @@
 #include <stdio.h>
 
 
-t_list *ft_sort_list( t_list *root )
+void	ft_reset_pos_sprites(t_sprite **sprites, t_all *all)
 {
-    t_list *new_root = NULL;
-	t_list *current;
-	t_list *node;
+	t_sprite	*tmp;
+	tmp = *sprites;
+	while (*sprites)
+	{
+		//printf("pos y{%d} x{%d}\n", (int)tmp->pos.y, (int)tmp->pos.x);
+		all->map_arr[(int)tmp->pos.y][(int)tmp->pos.x] = '2';
+		
+		tmp = (*sprites)->next;
+		free(*sprites);
+		*sprites = tmp;
+	}
+	*sprites = NULL;
+}
 
-    while ( root != NULL )
-    {
-        node = root;
-        root = root->next;
+int		add_front_sprite(t_sprite **sprites, t_all *all, t_ray ray)
+{
+	t_sprite	*new;
+	t_point		plr_pos;
+	
+	if (!(new = (t_sprite*)malloc(sizeof(*new))))
+		return (0);
 
-        if ( new_root == NULL || *((int*)node->content) > *((int*)new_root->content) )
-        {
-            node->next = new_root;
-            new_root = node;
-        }
-        else
-        {
+	plr_pos.x = (all->plr.pos.x / all->map_size.x);
+	plr_pos.y = (all->plr.pos.y / all->map_size.y);
+	new->pos.x = ((int)(ray.pos.x) / (int)(all->map_size.x) + 0.5);
+	new->pos.y = ((int)(ray.pos.y) / (int)(all->map_size.y) + 0.5);
+
+	//printf("{%.2f}{%.2f} spr pos\n", spr_pos.x, spr_pos.y);
+	all->map_arr[(int)new->pos.y][(int)new->pos.x] = '!';
+	
+	new->dir = atan2(new->pos.y - plr_pos.y, new->pos.x - plr_pos.x) * 180/M_PI_2;
+	new->dir = (int)(new->dir + 720) % 720;
+
+	new->dist = sqrt(pow(plr_pos.x - new->pos.x, 2) + pow(plr_pos.y - new->pos.y, 2));
+	new->dist *= cos((all->plr.dir - new->dir)/2 * M_PI/180);
+	new->size = all->win_height / new->dist;
+	//sprite_dist *= cos((sprite_dir - all->plr.dir) * M_PI_2/180);
+	// printf("sprite dist{%.3f}\n", sprite_dist * cos((sprite_dir - all->plr.dir) * M_PI/180));
+	//printf("sprite dir{%.3f}; dist{%.3f} size{%.3f}\n", new->dir, new->dist, new->size);
+	new->size = all->win_height / new->dist;
+	new->next = *sprites;
+	*sprites = new;
+	return (1);
+}
+
+t_sprite *ft_sort_list(t_sprite *root)
+{
+	t_sprite *new_root = NULL;
+	t_sprite *node = root;
+	t_sprite *current = new_root;
+	while ( root != NULL )
+	{
+		node = root;
+		root = root->next;
+		if ( new_root == NULL || node->dist > new_root->dist )
+		{
+			node->next = new_root;
+			new_root = node;
+		}
+		else
+		{
 			current = new_root;
-			while ( current->next != NULL && !( *((int*)node->content) > *((int*)current->content)))
-			{
+			while ( current->next != NULL && !( node->dist > current->next->dist ) )
 				current = current->next;
-			}
-
-            node->next = current->next;
-            current->next = node;
-        }
-    }
-
-    return new_root;
+			node->next = current->next;
+			current->next = node;
+		}
+	}
+	return new_root;
 }
 
 int		get_tex_color(t_tex *tex, int x, int y)
@@ -378,7 +419,18 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	return(0);
 }
 
-int		ft_draw_sprite(t_all *all, t_sprite sprite, double arr_len_ray[])
+int		ft_draw_sprites(t_all *all, t_sprite *sprite, double arr_len_ray[])
+{
+	int i = 0;
+	while(sprite)
+	{
+		printf("{%d} - {%.3f}\n",i++ , sprite->dist);
+		ft_draw_sprite(all, sprite, arr_len_ray);
+		sprite = sprite->next;
+	}
+	return (0);
+}
+int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 {
 	t_point plr_pos;
 	
@@ -389,34 +441,34 @@ int		ft_draw_sprite(t_all *all, t_sprite sprite, double arr_len_ray[])
 
 	// printf("sprite coord {%.2f}{%.2f}\n", sprite.pos.x, sprite.pos.y);
 	// printf("plr coord {%.2f}{%.2f}\n", plr_pos.x, plr_pos.y);
-	double	sprite_dir = atan2(sprite.pos.y - plr_pos.y, sprite.pos.x - plr_pos.x) * 180/M_PI_2;
-	sprite_dir = (int)(sprite_dir + 720) % 720;
-	double	sprite_dist = sqrt(pow(plr_pos.x - sprite.pos.x, 2) + pow(plr_pos.y - sprite.pos.y, 2));
-	sprite_dist *= cos((sprite_dir - all->plr.dir) * M_PI_2/180);
+	// double	sprite_dir = atan2(sprite.pos.y - plr_pos.y, sprite.pos.x - plr_pos.x) * 180/M_PI_2;
+	// sprite_dir = (int)(sprite_dir + 720) % 720;
+	// double	sprite_dist = sqrt(pow(plr_pos.x - sprite.pos.x, 2) + pow(plr_pos.y - sprite.pos.y, 2));
+	// sprite_dist *= cos((sprite_dir - all->plr.dir) * M_PI_2/180);
 	// printf("sprite dist{%.3f}\n", sprite_dist * cos((sprite_dir - all->plr.dir) * M_PI/180));
 	// printf("sprite dist{%.3f}\n", sprite_dist);
-	int	sprite_size = all->win_height / sprite_dist;
-	//printf("sprite dir {%.2f} and dist {%.2f}\n", sprite_dir, sprite_dist);
+	//int	sprite_size = all->win_height / sprite_dist;
+	printf("sprite dir {%.2f} and dist {%.2f}, size {%.2f}\n", sprite->dir, sprite->dist, sprite->size);
 	
-	int		h_offset = (sprite_dir - all->plr.dir) / 120 * all->win_width + all->win_width/2 - 64/2;
-	int		v_offset = all->win_height / 2 - sprite_size/2;
+	int		h_offset = (sprite->dir - all->plr.dir) / 120 * all->win_width + all->win_width/2 - 64/2;
+	int		v_offset = all->win_height / 2 - sprite->size/2;
 	
-	//printf("{%.2f}{%.2f} offset  \n", h_offset, v_offset);
+	printf("{%d}{%d} offset  \n", h_offset, v_offset);
 
 	int i = -1, j = -1;
 
-	while (i++ < sprite_size)
+	while (i++ < sprite->size)
 	{
 		if(h_offset+i < 0 || h_offset + i >= all->win_width)
 			continue;
-		printf("{%.2f ray len {%d}}{%.2f sprdist}\n", arr_len_ray[h_offset+i], h_offset+i ,sprite_dist);
-		if(arr_len_ray[h_offset+i] < sprite_dist)
+		//printf("{%.2f ray len {%d}}{%.2f sprdist}\n", arr_len_ray[h_offset+i], h_offset+i ,sprite_dist);
+		if(arr_len_ray[h_offset+i] < sprite->dist)
 			continue;
-		while (j++ < sprite_size - 2)
+		while (j++ < sprite->size - 2)
 		{
 			if(v_offset+j < 0 || v_offset + j >= all->win_height)
 				continue;
-			int color = get_tex_color(&all->tex[4], i*64/sprite_size, j*64/sprite_size);
+			int color = get_tex_color(&all->tex[4], i*64/sprite->size, j*64/sprite->size);
 			if(color)
 				my_mlx_pixel_put(&all->screen, all->win_width + h_offset + i, v_offset + j, color);
 		}
@@ -431,10 +483,10 @@ int		ft_draw_player(t_all *all)
 {
 	t_plr		*plr;
 	t_ray		ray;
-	t_sprite	sprite;
+	t_sprite	*sprites;
 	double		arr_len_ray[all->win_width];
 	
-	sprite.distance = -1.;
+	sprites = NULL;
 	ray.num_ray  = 0;
 	plr = &all->plr;
 	//printf("{%d}plr dir\n", plr->dir);
@@ -448,8 +500,14 @@ int		ft_draw_player(t_all *all)
 		{
 			if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '2')
 			{
-				sprite.pos.x = (int)(ray.pos.x / all->map_size.x) + 0.22;
-				sprite.pos.y = (int)(ray.pos.y / all->map_size.y) + 0.22;
+				add_front_sprite(&sprites, all, ray);
+				//sprite.pos.x = (int)(ray.pos.x / all->map_size.x) + 0.5; 		// + offset в координаты зависит от угла
+																				// здесь мы записываем координаты видимых нами спрайтов
+																				// 
+																				// будем проверять по координатам, бегая по списку каждый раз до самого конца
+																				// если есть список с такими же координатами, то ничего не делаем/
+																				// есть нету, то добавляем новый спрайт и вычислим их дистанции для будущей соритировки
+				//sprite.pos.y = (int)(ray.pos.y / all->map_size.y) + 0.5;
 			}
 			ray.pos.x = plr->pos.x + ray.len_ray * cos(ray.dir * M_PI_2/180);
 			ray.pos.y = plr->pos.y + ray.len_ray * sin(ray.dir * M_PI_2/180);
@@ -465,11 +523,11 @@ int		ft_draw_player(t_all *all)
 		ray.num_ray++;
 		ray.dir += 120. / all->win_width;
 	}
-	if((int)sprite.pos.y != 0 ) // будем рисовать спрайты после пускания лучей!))) 
-		{
-			//printf("{%f x}{%f y}{%f dist}{%d numray}\n", sprite.pos.x, sprite.pos.y, sprite.distance, sprite.num_ray);
-			ft_draw_sprite(all, sprite, arr_len_ray);
-		}
+	if(sprites)
+	{
+		ft_draw_sprites(all, ft_sort_list(sprites), arr_len_ray);
+		ft_reset_pos_sprites(&sprites, all);// и тут же можно очистить sprites
+	}
 	return(0);
 }
 

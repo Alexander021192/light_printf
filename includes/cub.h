@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/03 16:23:33 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/04 15:13:11 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,9 +81,11 @@ typedef struct s_ray
 
 typedef struct	s_sprite
 {
-	t_point	pos;
-	double	distance;
-	int		num_ray;
+	double			dir;
+	double			dist;
+	double			size;
+	t_point			pos;
+	struct s_sprite	*next;
 }				t_sprite;
 
 

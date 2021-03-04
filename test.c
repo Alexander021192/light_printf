@@ -1,64 +1,106 @@
-#include <math.h>
 #include <stdio.h>
-#include "./includes/mlx.h"
+#include <stdlib.h>
 
-typedef struct s_point
+typedef struct	s_point // структура для точки
 {
-	double x;
-	double y;
-}				t_pos;
+	double			x;
+	double			y;
+}				  t_point;
 
-typedef	struct s_win
+typedef struct	s_sprite
 {
-	void	*ptr;
-	void	*win;
-}				t_window;
+	double			dir;
+	double			dist;
+	double			size;
+	t_point			pos;
+	struct s_sprite	*next;
+}				t_sprite;
 
-
-
-typedef struct	s_tex
+int		add_front_sprite(t_sprite **sprites, double dist)
 {
-	char	*path;
-	void	*tex;
-	void	*ptr;
-	t_pos	start;
-	t_pos	end;
-	int		width;
-	int		height;
-	int		bpp;
-	int		size_line;
-	int		endian;
-}				t_tex;
+	t_sprite	*new;
+	t_point		plr_pos;
+	
+	if (!(new = (t_sprite*)malloc(sizeof(*new))))
+		return (0);
 
-static int
-	load_tex(t_window *window, t_tex *tex, char *path)
-{
-	if (path)
-	{
-		tex->path = path;
-		if ((tex->tex = mlx_xpm_file_to_image(window->ptr,
-			path, &tex->width, &tex->height)))
-			tex->ptr = mlx_get_data_addr(tex->tex,
-				&tex->bpp, &tex->size_line, &tex->endian);
-		else
-			return (0);
-	}
+	new->dist = dist;
+	new->next = *sprites;
+	*sprites = new;
 	return (1);
 }
 
-int main() 
+t_sprite *ft_sort_list(t_sprite *root)
 {
-	t_window window;
-	t_tex	*tex;
-	char	*path = "./maps/wall_1.xpm";
+	// t_sprite *new_root = root;
+	// t_sprite *current = root;
+	// t_sprite *next = root->next;
+	
 
-	window.ptr = mlx_init();
-	window.win = mlx_new_window(window.ptr, 1000, 1000, "asda");
+	t_sprite *new_root = NULL;
+	t_sprite *node = root;
+	t_sprite *current = new_root;
+	while ( root != NULL )
+	{
+		node = root;
+		root = root->next;
 
-	tex->tex = mlx_xpm_file_to_image(window.ptr, path, &tex->width, &tex->height);
-	tex->ptr = mlx_get_data_addr(tex->tex, &tex->bpp, &tex->size_line, &tex->endian);
+		if ( new_root == NULL || node->dist > new_root->dist )
+		{
+			node->next = new_root;
+			new_root = node;
+		}
+		else
+		{
+			current = new_root;
+			while ( current->next != NULL && !( node->dist > current->next->dist ) )
+			{
+				current = current->next;
+			}
+
+			node->next = current->next;
+			current->next = node;
+		}
+	}
+	return new_root;
+}
 
 
-	mlx_loop(window.ptr);
+int main(int argc, char const *argv[])
+{
+	double i = 5;
+	t_sprite *sprites;
+	t_sprite *sorted;
+	sprites = NULL;
+	// while (i > 0)
+	// {
+	// 	add_front_sprite(&sprites, i);
+	// 	i += 0.5 * (-1);
+	// }
+	i = 0;
 
+	add_front_sprite(&sprites, 9.);
+	add_front_sprite(&sprites, 4.);
+	add_front_sprite(&sprites, 8.);
+	add_front_sprite(&sprites, 2.);
+
+	sorted = sprites;
+	printf(" non sorted\n");
+	while (sprites)
+	{
+		printf(" {%.3f}", sprites->dist);
+		sprites = sprites->next;
+		i += 1; 
+	}
+	printf("\nsorted\n");
+	i = 0;
+	sorted = ft_sort_list(sorted);
+	while (sorted)
+	{
+		printf(" {%.3f} ", sorted->dist);
+		sorted = sorted->next;
+		i += 1; 
+	}
+	
+	return 0;
 }
