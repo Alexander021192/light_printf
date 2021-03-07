@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/07 16:44:03 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/07 17:56:50 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,19 +42,19 @@ int		add_front_sprite(t_sprite **sprites, t_all *all, t_ray ray)
 	if (!(new = (t_sprite*)malloc(sizeof(*new))))
 		return (0);
 
-	plr_pos.x = (all->plr.pos.x / all->map_size.x);
-	plr_pos.y = (all->plr.pos.y / all->map_size.y);
+	plr_pos.x = all->plr.pos.x;
+	plr_pos.y = all->plr.pos.y;
 	new->pos.x = ((int)(ray.pos.x)  + 0.5);
 	new->pos.y = ((int)(ray.pos.y)  + 0.5);
 
 	//printf("{%.2f}{%.2f} spr pos\n", new->pos.y, new->pos.x);
 	all->map_arr[(int)new->pos.y][(int)new->pos.x] = '!';
 	
-	new->dir = atan2(new->pos.y - plr_pos.y, new->pos.x - plr_pos.x) * 180/M_PI_2;
-	new->dir = (int)(new->dir + 720) % 720;
+	new->dir = atan2(new->pos.y - plr_pos.y, new->pos.x - plr_pos.x) * 180/M_PI;
+	new->dir = (int)(new->dir + 360) % 360;
 
 	new->dist = sqrt(pow(plr_pos.x - new->pos.x, 2) + pow(plr_pos.y - new->pos.y, 2));
-	new->dist *= cos((all->plr.dir - new->dir)/2 * M_PI/180);
+	new->dist *= cos((all->plr.dir - new->dir) * M_PI/180);
 	new->size = all->win_height / new->dist;
 	//sprite_dist *= cos((sprite_dir - all->plr.dir) * M_PI_2/180);
 	// printf("sprite dist{%.3f}\n", sprite_dist * cos((sprite_dir - all->plr.dir) * M_PI/180));
@@ -150,15 +150,16 @@ int		y_update_pos(t_all *all, int flag)
 	plr	= &all->plr;
 	old_pos.x = plr->pos.x;
 	old_pos.y = plr->pos.y;
-	dir = plr->dir * (M_PI_2 / 180) + M_PI_2;
+	dir = plr->dir * (M_PI / 180) + M_PI_2;
+	
 	//printf("{%f} - x; {%f} - y; {%d} - dir: pos\n", plr->pos.x, plr->pos.y, plr->dir);
 	
 	new_pos.y = old_pos.y + flag * SPEED;
 	//plr->pos.y = new_pos.y;
 	plr->pos.x = - (new_pos.y - old_pos.y) * sin(dir) + old_pos.x;
 	plr->pos.y = (new_pos.y - old_pos.y) * cos(dir) + old_pos.y;
-	if(all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '1' || 
-	all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '2')
+	if(all->map_arr[(int)plr->pos.y][(int)plr->pos.x] == '1' || 
+	all->map_arr[(int)plr->pos.y][(int)plr->pos.x] == '2')
 	{
 		plr->pos.x = old_pos.x;
 		plr->pos.y = old_pos.y;
@@ -177,15 +178,15 @@ int		x_update_pos(t_all *all, int flag)
 	plr	= &all->plr;
 	old_pos.x = plr->pos.x;
 	old_pos.y = plr->pos.y;
-	dir = plr->dir * (M_PI_2 / 180) + M_PI_2;
+	dir = plr->dir * (M_PI / 180) + M_PI_2;
 
 	
 	new_pos.x = old_pos.x + flag * SPEED;
 	plr->pos.x = (new_pos.x - old_pos.x) * cos(dir) + old_pos.x;
 	plr->pos.y = (new_pos.x - old_pos.x) * sin(dir) + old_pos.y;
 	
-	if(all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '1' || 
-	all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '2')
+	if(all->map_arr[(int)plr->pos.y][(int)plr->pos.x] == '1' || 
+	all->map_arr[(int)plr->pos.y][(int)plr->pos.x] == '2')
 	{
 		plr->pos.x = old_pos.x;
 		plr->pos.y = old_pos.y;
@@ -197,8 +198,8 @@ int		x_update_pos(t_all *all, int flag)
 int		rotate_camera(t_all *all, int flag)
 {
 	all->plr.dir = all->plr.dir + flag * 2;
-	all->plr.dir -= (all->plr.dir > 720.) ? 720 : 0;
-	all->plr.dir += (all->plr.dir < 0.) ? 720 : 0;
+	all->plr.dir -= (all->plr.dir > 360.) ? 360 : 0;
+	all->plr.dir += (all->plr.dir < 0.) ? 360 : 0;
 	return (1);
 }
 
@@ -271,16 +272,16 @@ int		ft_init_player(t_all *all)
 		{
 			if(ft_strchr("SWNE", all->map_arr[(int)point.y][(int)point.x]))
 			{
-				plr.pos.x = point.x * all->map_size.x + all->map_size.x/2; //change on pxl_size
-				plr.pos.y = point.y * all->map_size.y + all->map_size.y/2;
+				plr.pos.x = point.x + 0.5; //change on pxl_size
+				plr.pos.y = point.y + 0.5;
 				if(all->map_arr[(int)point.y][(int)point.x] == 'E')
 					plr.dir = 0;
 				else if(all->map_arr[(int)point.y][(int)point.x] == 'S')
-					plr.dir = 180;
+					plr.dir = 90;
 				else if(all->map_arr[(int)point.y][(int)point.x] == 'W')
-					plr.dir = 360;
+					plr.dir = 180;
 				else if (all->map_arr[(int)point.y][(int)point.x] == 'N')
-					plr.dir = 540;
+					plr.dir = 270;
 				all->plr = plr;
 				return (0);
 			}
@@ -359,10 +360,10 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	int		column_height;
 	t_point	pos;
 
-	ray.dir = ((int)ray.dir + 720) % 720;
+	ray.dir = ((int)ray.dir + 360) % 360;
 	//printf("{%f} ray.len  \n", ray.len_ray);	
 	//ray.len_ray = (ray.len_ray ) / all->map_size.y * cos((ray.dir - all->plr.dir) * (M_PI_2)/180);
-	column_height = (all->win_height/(ray.len_ray * cos((ray.dir - all->plr.dir) * (M_PI_2)/180)));
+	column_height = (all->win_height/(ray.len_ray * cos((ray.dir - all->plr.dir) * (M_PI)/180)));
 
 
 
@@ -374,9 +375,9 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	//----------func get x_texcoord ----------//
 	double	hitx;
 	if(ray.side == 0)
-		hitx = (all->plr.pos.y / all->map_size.y) + ray.len_ray * (sin(ray.dir * M_PI_2 / 180));
+		hitx = all->plr.pos.y + ray.len_ray * (sin(ray.dir * M_PI / 180));
 	else
-		hitx = (all->plr.pos.x / all->map_size.x) + ray.len_ray * (cos(ray.dir * M_PI_2 / 180));
+		hitx = all->plr.pos.x + ray.len_ray * (cos(ray.dir * M_PI / 180));
 	// hity = ray.pos.y/all->map_size.y - (int)(ray.pos.y/all->map_size.y + 0.5);
 	// hitx = ray.pos.x/all->map_size.x - (int)(ray.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
 	hitx -= floor(hitx);
@@ -391,7 +392,7 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	
 	if(ray.side == 0)
 	{
-		if(ray.dir > 180 && ray.dir < 540)
+		if(ray.dir > 90 && ray.dir < 270)
 			num_tex = 3;
 		else
 			num_tex = 1;
@@ -399,23 +400,23 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	else
 	{
 		//printf("{%f ray dir}\n", ray.dir);
-		if(ray.dir > 0 && ray.dir < 360)
+		if(ray.dir > 0 && ray.dir < 180)
 			num_tex = 2;
 		else
 			num_tex = 0;
 	}
 
 	x_texcoord = (hitx * all->tex->width);
-	if((ray.side == 0 && cos(ray.dir * M_PI_2 / 180) > 0))
+	if((ray.side == 0 && cos(ray.dir * M_PI / 180) > 0))
 		x_texcoord = all->tex->width - x_texcoord - 1;
-	if((ray.side == 1 && sin(ray.dir * M_PI_2 / 180) > 0))
+	if((ray.side == 1 && sin(ray.dir * M_PI / 180) > 0))
 		x_texcoord = all->tex->width - x_texcoord - 1;
-	// printf("{%f}hit  {%d} x textcoord{%f} column hight\n", hitx, x_texcoord, column_height);
+	//printf("{%f}hit  {%d} x textcoord{%f} column hight\n", hitx, x_texcoord, column_height);
 	// -----------------------------//
 	y_texcoord = 0;
 	pos.x = ray.num_ray;
 	pos.y = (all->win_height/2 - column_height/2);
-	//printf("{%d} texcoord\n", x_texcoord);
+	printf("{%d} texcoord\n", x_texcoord);
 	//printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
 
 	int i = (column_height > all->win_height) ? (int)(-pos.y) : 0;
@@ -458,14 +459,14 @@ int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 	//printf("sprite dir {%.2f} and dist {%.2f}, size {%.2f}\n", sprite->dir, sprite->dist, sprite->size);
 	double	abs_dir;
 	abs_dir = sprite->dir - all->plr.dir; 
-	if(abs_dir > 80)
-		abs_dir -= 720;
-	else if(abs_dir < - 80)
-		abs_dir += 720;
+	if(abs_dir > 40)
+		abs_dir -= 360;
+	else if(abs_dir < - 40)
+		abs_dir += 360;
 		
 		
 	// printf("{%f}abs dir\n", abs_dir);
-	int		h_offset = (abs_dir) / 120 * all->win_width + all->win_width/2 - sprite->size/2;
+	int		h_offset = (abs_dir) / 60 * all->win_width + all->win_width/2 - sprite->size/2;
 	int		v_offset = all->win_height / 2 - sprite->size/2;
 	
 	// printf("{%.2f} spr dir {%.2f} plr dir {%.2f} разница\n", sprite->dir, all->plr.dir, (sprite->dir - all->plr.dir));
@@ -505,8 +506,8 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 { // поделить функцию пополам
 	t_point plr_pos;
 
-	plr_pos.x = all->plr.pos.x / all->map_size.x;
-	plr_pos.y = all->plr.pos.y / all->map_size.y;
+	plr_pos.x = all->plr.pos.x;
+	plr_pos.y = all->plr.pos.y;
 
 	ray->pos.x = (int)plr_pos.x;
 	ray->pos.y = (int)plr_pos.y;
@@ -516,21 +517,21 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 	
 	// printf("{%.f}{%.f}\n", plr_pos.x , plr_pos.y);
 	
-	if(sin(ray->dir * M_PI_2/180) == 0)
+	if(sin(ray->dir * M_PI/180) == 0)
 		ray->delta_dist.x = 0;
-	else if(cos(ray->dir * M_PI_2/180) == 0)
+	else if(cos(ray->dir * M_PI/180) == 0)
 		ray->delta_dist.x = 1;
 	else
-		ray->delta_dist.x = ABS(1 / cos(ray->dir * M_PI_2/180));
+		ray->delta_dist.x = ABS(1 / cos(ray->dir * M_PI/180));
 	
-	if(cos(ray->dir * M_PI_2/180) == 0)
+	if(cos(ray->dir * M_PI/180) == 0)
 		ray->delta_dist.y = 0;
-	else if(sin(ray->dir * M_PI_2/180) == 0)
+	else if(sin(ray->dir * M_PI/180) == 0)
 		ray->delta_dist.y = 1;
 	else
-		ray->delta_dist.y = ABS(1 / sin(ray->dir * M_PI_2/180));
+		ray->delta_dist.y = ABS(1 / sin(ray->dir * M_PI/180));
 
-	if(cos(ray->dir * M_PI_2/180) < 0)
+	if(cos(ray->dir * M_PI/180) < 0)
 	{
 		ray->step.x = -1;
 		ray->side_dist.x = (plr_pos.x - (int)plr_pos.x) * ray->delta_dist.x;
@@ -540,7 +541,7 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 		ray->step.x = 1;
 		ray->side_dist.x = ((int)plr_pos.x + 1. - plr_pos.x) * ray->delta_dist.x;
 	}
-	if (sin(ray->dir * M_PI_2/180) < 0)
+	if (sin(ray->dir * M_PI/180) < 0)
 	{
 		ray->step.y = -1;
 		ray->side_dist.y = (plr_pos.y - (int)plr_pos.y) * ray->delta_dist.y;
@@ -574,11 +575,11 @@ double	ft_get_len_ray(t_all *all, t_ray *ray)
 	
 	double len_ray = 0;
 	if (ray->side == 0)
-		len_ray = (ray->pos.x - all->plr.pos.x / all->map_size.x + (1 - ray->step.x) / 2) 
-		/ (cos(ray->dir * M_PI_2/180));
+		len_ray = (ray->pos.x - all->plr.pos.x  + (1 - ray->step.x) / 2) 
+		/ (cos(ray->dir * M_PI/180));
 	else
-		len_ray = (ray->pos.y - all->plr.pos.y / all->map_size.y + (1 - ray->step.y) / 2) 
-		/ (sin(ray->dir * M_PI_2/180));
+		len_ray = (ray->pos.y - all->plr.pos.y + (1 - ray->step.y) / 2) 
+		/ (sin(ray->dir * M_PI/180));
 	ray->len_ray = len_ray;
 	return (len_ray);
 }
@@ -594,8 +595,8 @@ int		ft_draw_player(t_all *all)
 	ray.num_ray  = 0;
 	plr = &all->plr;
 	//printf("{%d}plr dir\n", plr->dir);
-	ray.dir = plr->dir - 60;
-	while(ray.dir < plr->dir + 60)
+	ray.dir = plr->dir - 30;
+	while(ray.dir < plr->dir + 30)
 	{
 		ft_init_ray(all, &ray);
 		// ray.len_ray = 0;
@@ -603,6 +604,8 @@ int		ft_draw_player(t_all *all)
 		// ray.pos.y = plr->pos.y;
 		while(all->map_arr[(int)ray.pos.y][(int)ray.pos.x] != '1')
 		{
+			//ft_draw_my_pixel(all, ray.pos, all->map_size, 0x80ff00);
+			//my_mlx_pixel_put(&all->screen, ray.pos.x, ray.pos.y, 0x80ff00);
 			ft_dda_step(&ray);
 			if (all->map_arr[(int)ray.pos.y][(int)ray.pos.x] == '2')
 				add_front_sprite(&sprites, all, ray);
@@ -613,7 +616,7 @@ int		ft_draw_player(t_all *all)
 			ft_draw_wall(all, ray);
 		}
 		ray.num_ray += 1 ;
-		ray.dir += 120. / all->win_width;
+		ray.dir += 60. / all->win_width;
 	}
 	//printf("{%d} num ray\n", ray.num_ray);
 	if(sprites)

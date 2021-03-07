@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/07 11:47:06 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/07 17:38:20 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define CUB_H
 
 #define MAP_SCALE 1 // условный размер карты от основного экрана
-#define SPEED 1
+#define SPEED 0.05
 
 # define KEY_1			18
 # define KEY_2			19
