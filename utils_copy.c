@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils_copy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/04 17:34:20 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/07 12:23:21 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,9 @@ int		x_update_pos(t_all *all, int flag)
 
 int		rotate_camera(t_all *all, int flag)
 {
-	all->plr.dir = (all->plr.dir + 720) % 720 + flag * 2;
+	all->plr.dir = all->plr.dir + flag * 2;
+	all->plr.dir -= (all->plr.dir > 720.) ? 720 : 0;
+	all->plr.dir += (all->plr.dir < 0.) ? 720 : 0;
 	return (1);
 }
 
@@ -352,7 +354,7 @@ int		ft_draw_back(t_all *all)
 
 int		ft_draw_wall(t_all *all, t_ray ray) 
 {
-	double		column_height;
+	int		column_height;
 	t_point	pos;
 
 	ray.dir = ((int)ray.dir + 720) % 720;
@@ -370,7 +372,13 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	double	hitx, hity;
 	hity = ray.pos.y/all->map_size.y - (int)(ray.pos.y/all->map_size.y + 0.5);
 	hitx = ray.pos.x/all->map_size.x - (int)(ray.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
-
+	
+	
+	if(ray.dir == all->plr.dir)
+	{
+		printf("{%f}texture coord \n", MAX(ABS(hity), ABS(hitx)));
+		printf("{%f} len; {%d} - column; {%d} - num ray\n", ray.len_ray, column_height, ray.num_ray);
+	}
 	//-----------//func get number tex-------------
 	int num_tex = 0;
 	
@@ -498,23 +506,24 @@ int		ft_draw_player(t_all *all)
 			}
 			ray.pos.x = plr->pos.x + ray.len_ray * cos(ray.dir * M_PI_2/180);
 			ray.pos.y = plr->pos.y + ray.len_ray * sin(ray.dir * M_PI_2/180);
-			//my_mlx_pixel_put(&all->screen, ray.pos.x, ray.pos.y, 0x80ff00);
+			my_mlx_pixel_put(&all->screen, ray.pos.x, ray.pos.y, 0x80ff00);
 			ray.len_ray += 1; //именно из за этого шага у меня полоса с краев стен!!! изменить систему шага
 		}
 		if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '1')
 		{
 			arr_len_ray[ray.num_ray] = sqrt(pow((plr->pos.x - ray.pos.x)/all->map_size.x, 2) + pow((plr->pos.y - ray.pos.y)/all->map_size.y, 2));
-;
+			if(ray.dir == plr->dir)
+				printf("{%d}ray_x; {%d}ray-y\n",(int)ray.pos.x / (int)all->map_size.x , (int)ray.pos.y / (int)all->map_size.y);
 			ft_draw_wall(all, ray);
 		}
 		ray.num_ray++;
 		ray.dir += 120. / all->win_width;
 	}
-	if(sprites)
-	{
-		ft_draw_sprites(all, ft_sort_list(sprites), arr_len_ray);
-		ft_reset_pos_sprites(&sprites, all);// и тут же можно очистить sprites
-	}
+	// if(sprites)
+	// {
+	// 	ft_draw_sprites(all, ft_sort_list(sprites), arr_len_ray);
+	// 	ft_reset_pos_sprites(&sprites, all);// и тут же можно очистить sprites
+	// }
 	return(0);
 }
 

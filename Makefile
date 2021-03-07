@@ -6,7 +6,7 @@
 #    By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/07 11:05:52 by rchallie          #+#    #+#              #
-#    Updated: 2021/02/16 17:13:57 by ocalamar         ###   ########.fr        #
+#    Updated: 2021/03/07 11:11:06 by ocalamar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,9 @@ SRCS1 = mlx_mac.c 			\
 		utils.c			\
 
 
-SRCS2 =	parcer.c		\
+SRCS2 = mlx_mac.c 			\
+		parser_map.c 	\
+		utils_copy.c			\
 
 
 # NAME = libft_with_gnl.a
@@ -26,11 +28,11 @@ CC_FLAGS = -Wall -Wextra -Werror
 
 MLX_FLAGS = -framework OpenGL -framework Appkit
 
-mlx: 
+1: 
 		$(CC) $(SRCS1) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit	&& ./a.out
 
-parcer:
-		$(CC) $(SRCS2) libft_with_gnl.a && ./a.out
+2:
+		$(CC) $(SRCS2) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit	&& ./a.out
 
 # $(OBJS_DIR)%.o : %.c
 # 	@mkdir -p $(OBJS_DIR)

@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/04 18:35:04 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/07 11:47:06 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ typedef	struct	s_win //структура для окна
 
 typedef struct	s_plr //структура для игрока и луча
 {
-	int			dir;
+	double		dir;
 	t_point		pos;
 
 }				t_plr;

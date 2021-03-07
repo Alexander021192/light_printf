@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/04 19:34:26 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/07 16:44:03 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	ft_reset_pos_sprites(t_sprite **sprites, t_all *all)
 	tmp = *sprites;
 	while (*sprites)
 	{
-		//printf("pos y{%d} x{%d}\n", (int)tmp->pos.y, (int)tmp->pos.x);
+		//printf("pos y{%d} x{%d} reset pos sprite\n", (int)tmp->pos.y, (int)tmp->pos.x);
 		all->map_arr[(int)tmp->pos.y][(int)tmp->pos.x] = '2';
 		
 		tmp = (*sprites)->next;
@@ -44,10 +44,10 @@ int		add_front_sprite(t_sprite **sprites, t_all *all, t_ray ray)
 
 	plr_pos.x = (all->plr.pos.x / all->map_size.x);
 	plr_pos.y = (all->plr.pos.y / all->map_size.y);
-	new->pos.x = ((int)(ray.pos.x) / (int)(all->map_size.x) + 0.5);
-	new->pos.y = ((int)(ray.pos.y) / (int)(all->map_size.y) + 0.5);
+	new->pos.x = ((int)(ray.pos.x)  + 0.5);
+	new->pos.y = ((int)(ray.pos.y)  + 0.5);
 
-	//printf("{%.2f}{%.2f} spr pos\n", spr_pos.x, spr_pos.y);
+	//printf("{%.2f}{%.2f} spr pos\n", new->pos.y, new->pos.x);
 	all->map_arr[(int)new->pos.y][(int)new->pos.x] = '!';
 	
 	new->dir = atan2(new->pos.y - plr_pos.y, new->pos.x - plr_pos.x) * 180/M_PI_2;
@@ -157,7 +157,8 @@ int		y_update_pos(t_all *all, int flag)
 	//plr->pos.y = new_pos.y;
 	plr->pos.x = - (new_pos.y - old_pos.y) * sin(dir) + old_pos.x;
 	plr->pos.y = (new_pos.y - old_pos.y) * cos(dir) + old_pos.y;
-	if(all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '1')
+	if(all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '1' || 
+	all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '2')
 	{
 		plr->pos.x = old_pos.x;
 		plr->pos.y = old_pos.y;
@@ -183,7 +184,8 @@ int		x_update_pos(t_all *all, int flag)
 	plr->pos.x = (new_pos.x - old_pos.x) * cos(dir) + old_pos.x;
 	plr->pos.y = (new_pos.x - old_pos.x) * sin(dir) + old_pos.y;
 	
-	if(all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '1')
+	if(all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '1' || 
+	all->map_arr[(int)plr->pos.y/(int)all->map_size.y][(int)plr->pos.x/(int)all->map_size.x] == '2')
 	{
 		plr->pos.x = old_pos.x;
 		plr->pos.y = old_pos.y;
@@ -194,7 +196,9 @@ int		x_update_pos(t_all *all, int flag)
 
 int		rotate_camera(t_all *all, int flag)
 {
-	all->plr.dir = (all->plr.dir + 720) % 720 + flag * 2;
+	all->plr.dir = all->plr.dir + flag * 2;
+	all->plr.dir -= (all->plr.dir > 720.) ? 720 : 0;
+	all->plr.dir += (all->plr.dir < 0.) ? 720 : 0;
 	return (1);
 }
 
@@ -352,13 +356,14 @@ int		ft_draw_back(t_all *all)
 
 int		ft_draw_wall(t_all *all, t_ray ray) 
 {
-	double		column_height;
+	int		column_height;
 	t_point	pos;
 
 	ray.dir = ((int)ray.dir + 720) % 720;
 	//printf("{%f} ray.len  \n", ray.len_ray);	
 	//ray.len_ray = (ray.len_ray ) / all->map_size.y * cos((ray.dir - all->plr.dir) * (M_PI_2)/180);
-	column_height = (all->win_height/ray.len_ray);
+	column_height = (all->win_height/(ray.len_ray * cos((ray.dir - all->plr.dir) * (M_PI_2)/180)));
+
 
 
 
@@ -369,16 +374,22 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	//----------func get x_texcoord ----------//
 	double	hitx;
 	if(ray.side == 0)
-		hitx = all->plr.pos.x / all->map_size.x + ray.len_ray * ABS(cos(ray.dir * M_PI_2 / 180));
+		hitx = (all->plr.pos.y / all->map_size.y) + ray.len_ray * (sin(ray.dir * M_PI_2 / 180));
 	else
-		hitx = all->plr.pos.y / all->map_size.y + ray.len_ray * ABS(sin(ray.dir * M_PI_2 / 180));
+		hitx = (all->plr.pos.x / all->map_size.x) + ray.len_ray * (cos(ray.dir * M_PI_2 / 180));
 	// hity = ray.pos.y/all->map_size.y - (int)(ray.pos.y/all->map_size.y + 0.5);
 	// hitx = ray.pos.x/all->map_size.x - (int)(ray.pos.x/all->map_size.x + 0.5); // как сделать, чтобы не видеть самый самый край стены
-	hitx -= (int)hitx;
+	hitx -= floor(hitx);
+	// if(ray.dir == all->plr.dir)
+	// {
+	//printf("{%f}texture coord \n", hitx);
+	// 	printf("plr pos {%.2f}{%.2f}\n", all->plr.pos.x / all->map_size.x, all->plr.pos.y / all->map_size.y);
+	// 	printf("{%f} len; {%d} - column; {%d} - num ray\n", ray.len_ray, column_height, ray.num_ray);
+	// }
 	//-----------//func get number tex-------------
 	int num_tex = 0;
 	
-	if(ray.side == 1)
+	if(ray.side == 0)
 	{
 		if(ray.dir > 180 && ray.dir < 540)
 			num_tex = 3;
@@ -394,8 +405,12 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 			num_tex = 0;
 	}
 
-	x_texcoord = hitx * all->tex->width;
-	printf("{%f}hit  {%d} x textcoord{%f} column hight\n", hitx, x_texcoord, column_height);
+	x_texcoord = (hitx * all->tex->width);
+	if((ray.side == 0 && cos(ray.dir * M_PI_2 / 180) > 0))
+		x_texcoord = all->tex->width - x_texcoord - 1;
+	if((ray.side == 1 && sin(ray.dir * M_PI_2 / 180) > 0))
+		x_texcoord = all->tex->width - x_texcoord - 1;
+	// printf("{%f}hit  {%d} x textcoord{%f} column hight\n", hitx, x_texcoord, column_height);
 	// -----------------------------//
 	y_texcoord = 0;
 	pos.x = ray.num_ray;
@@ -428,7 +443,8 @@ int		ft_draw_sprites(t_all *all, t_sprite *sprite, double arr_len_ray[])
 	int i = 0;
 	while(sprite)
 	{
-		printf("{%d} - {%.3f}\n",i++ , sprite->dist);
+		// printf("{%.2f}{%.2f} pos spr\n", sprite->pos.x, sprite->pos.y);
+		// printf("{%d}num sprite - {%.3f} distanse\n",i++ , sprite->dist);
 		ft_draw_sprite(all, sprite, arr_len_ray);
 		sprite = sprite->next;
 	}
@@ -439,15 +455,26 @@ int		ft_draw_sprites(t_all *all, t_sprite *sprite, double arr_len_ray[])
 int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 {
 
-	printf("sprite dir {%.2f} and dist {%.2f}, size {%.2f}\n", sprite->dir, sprite->dist, sprite->size);
-	
-	int		h_offset = (sprite->dir - all->plr.dir) / 120 * all->win_width + all->win_width/2 - 64/2;
+	//printf("sprite dir {%.2f} and dist {%.2f}, size {%.2f}\n", sprite->dir, sprite->dist, sprite->size);
+	double	abs_dir;
+	abs_dir = sprite->dir - all->plr.dir; 
+	if(abs_dir > 80)
+		abs_dir -= 720;
+	else if(abs_dir < - 80)
+		abs_dir += 720;
+		
+		
+	// printf("{%f}abs dir\n", abs_dir);
+	int		h_offset = (abs_dir) / 120 * all->win_width + all->win_width/2 - sprite->size/2;
 	int		v_offset = all->win_height / 2 - sprite->size/2;
 	
-	printf("{%d}{%d} offset  \n", h_offset, v_offset);
+	// printf("{%.2f} spr dir {%.2f} plr dir {%.2f} разница\n", sprite->dir, all->plr.dir, (sprite->dir - all->plr.dir));
+	
 
-	int i = -1, j = -1;
-
+	int i = -1;
+	int j = -1;
+	
+	//printf("{%d} -h {%d} - v offset  \n", h_offset, v_offset);
 	while (i++ < sprite->size)
 	{
 		if(h_offset+i < 0 || h_offset + i >= all->win_width)
@@ -457,11 +484,15 @@ int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 			continue;
 		while (j++ < sprite->size - 2)
 		{
-			if(v_offset+j < 0 || v_offset + j >= all->win_height)
+			if(v_offset + j < 0 || v_offset + j >= all->win_height - 5)
 				continue;
 			int color = get_tex_color(&all->tex[4], i*64/sprite->size, j*64/sprite->size);
 			if(color)
+			// {
+				//if(v_offset + j > 1 && v_offset + j < all->win_height)
+					//printf("{%d} \n", v_offset + j);
 				my_mlx_pixel_put(&all->screen, all->win_width + h_offset + i, v_offset + j, color);
+			// }
 		}
 		j = -1;
 		
@@ -479,19 +510,22 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 
 	ray->pos.x = (int)plr_pos.x;
 	ray->pos.y = (int)plr_pos.y;
+	// if(ray->dir == all->plr.dir)
 	
-	printf("{%.f}{%.f}\n", plr_pos.x , plr_pos.y);
+	//printf("{%f}{%f}ray pos init \n", ray->pos.x, ray->pos.y);
+	
+	// printf("{%.f}{%.f}\n", plr_pos.x , plr_pos.y);
 	
 	if(sin(ray->dir * M_PI_2/180) == 0)
 		ray->delta_dist.x = 0;
-	else if(cos((ray->dir * M_PI_2/180) == 0))
+	else if(cos(ray->dir * M_PI_2/180) == 0)
 		ray->delta_dist.x = 1;
 	else
 		ray->delta_dist.x = ABS(1 / cos(ray->dir * M_PI_2/180));
 	
 	if(cos(ray->dir * M_PI_2/180) == 0)
 		ray->delta_dist.y = 0;
-	else if(sin((ray->dir * M_PI_2/180) == 0))
+	else if(sin(ray->dir * M_PI_2/180) == 0)
 		ray->delta_dist.y = 1;
 	else
 		ray->delta_dist.y = ABS(1 / sin(ray->dir * M_PI_2/180));
@@ -504,7 +538,7 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 	else
 	{
 		ray->step.x = 1;
-		ray->side_dist.x = (1.0 - (plr_pos.x - (int)plr_pos.x)) * ray->delta_dist.x;
+		ray->side_dist.x = ((int)plr_pos.x + 1. - plr_pos.x) * ray->delta_dist.x;
 	}
 	if (sin(ray->dir * M_PI_2/180) < 0)
 	{
@@ -514,7 +548,7 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 	else
 	{
 		ray->step.y = 1;
-		ray->side_dist.y = (1.0 - (plr_pos.y - (int)plr_pos.y)) * ray->delta_dist.y;
+		ray->side_dist.y = ((int)plr_pos.y + 1. - plr_pos.y) * ray->delta_dist.y;
 	}
 	return (0);
 }
@@ -541,10 +575,10 @@ double	ft_get_len_ray(t_all *all, t_ray *ray)
 	double len_ray = 0;
 	if (ray->side == 0)
 		len_ray = (ray->pos.x - all->plr.pos.x / all->map_size.x + (1 - ray->step.x) / 2) 
-		/ ABS(cos(ray->dir * M_PI_2/180));
+		/ (cos(ray->dir * M_PI_2/180));
 	else
 		len_ray = (ray->pos.y - all->plr.pos.y / all->map_size.y + (1 - ray->step.y) / 2) 
-		/ ABS(sin(ray->dir * M_PI_2/180));
+		/ (sin(ray->dir * M_PI_2/180));
 	ray->len_ray = len_ray;
 	return (len_ray);
 }
@@ -578,43 +612,14 @@ int		ft_draw_player(t_all *all)
 			arr_len_ray[ray.num_ray] = ft_get_len_ray(all, &ray);
 			ft_draw_wall(all, ray);
 		}
-		
-		//--------------------------------------// как будто вот это заменяем
-		
-		while(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] != '1')
-		{
-			if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '2')
-			{
-				add_front_sprite(&sprites, all, ray);
-				//sprite.pos.x = (int)(ray.pos.x / all->map_size.x) + 0.5; 		// + offset в координаты зависит от угла
-																				// здесь мы записываем координаты видимых нами спрайтов
-																				// 
-																				// будем проверять по координатам, бегая по списку каждый раз до самого конца
-																				// если есть список с такими же координатами, то ничего не делаем/
-																				// есть нету, то добавляем новый спрайт и вычислим их дистанции для будущей соритировки
-				//sprite.pos.y = (int)(ray.pos.y / all->map_size.y) + 0.5;
-			}
-			ray.pos.x = plr->pos.x + ray.len_ray * cos(ray.dir * M_PI_2/180);
-			ray.pos.y = plr->pos.y + ray.len_ray * sin(ray.dir * M_PI_2/180);
-			//my_mlx_pixel_put(&all->screen, ray.pos.x, ray.pos.y, 0x80ff00);
-			ray.len_ray += 1; //именно из за этого шага у меня полоса с краев стен!!! изменить систему шага
-		}
-		if(all->map_arr[(int)ray.pos.y / (int)all->map_size.y][(int)ray.pos.x / (int)all->map_size.x] == '1')
-		{
-			arr_len_ray[ray.num_ray] = sqrt(pow((plr->pos.x - ray.pos.x)/all->map_size.x, 2) + pow((plr->pos.y - ray.pos.y)/all->map_size.y, 2));
-;
-			ft_draw_wall(all, ray);
-		}
-		
-		// ---------------------------//
-
-		
-		ray.num_ray++;
+		ray.num_ray += 1 ;
 		ray.dir += 120. / all->win_width;
 	}
+	//printf("{%d} num ray\n", ray.num_ray);
 	if(sprites)
 	{
-		//ft_draw_sprites(all, ft_sort_list(sprites), arr_len_ray);
+		sprites = ft_sort_list(sprites);
+		ft_draw_sprites(all, sprites, arr_len_ray);
 		ft_reset_pos_sprites(&sprites, all);// и тут же можно очистить sprites
 	}
 	return(0);
