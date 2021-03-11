@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 11:40:26 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/07 17:42:23 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 19:04:09 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ int		ft_init_config(t_all *all)
 {
 	// парсим ширину высоту экрана//
 
-	all->win_height = 768;
-	all->win_width = 1024;
+	all->win_height = 600;
+	all->win_width = 1600 + 1600%64;
 	
-	all->map_size.x = (int)((all->win_width / all->map_size.x) * MAP_SCALE);
-	all->map_size.y = (int)((all->win_height / all->map_size.y) * MAP_SCALE);
+	all->map_size.x = ((all->win_width / all->map_size.x) * MAP_SCALE);
+	all->map_size.y = ((all->win_height / all->map_size.y) * MAP_SCALE);
 
 	
 	return(0);

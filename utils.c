@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/07 17:56:50 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 19:04:33 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,15 +51,18 @@ int		add_front_sprite(t_sprite **sprites, t_all *all, t_ray ray)
 	all->map_arr[(int)new->pos.y][(int)new->pos.x] = '!';
 	
 	new->dir = atan2(new->pos.y - plr_pos.y, new->pos.x - plr_pos.x) * 180/M_PI;
-	new->dir = (int)(new->dir + 360) % 360;
+	//new->dir = (int)(new->dir + 360) % 360;
 
 	new->dist = sqrt(pow(plr_pos.x - new->pos.x, 2) + pow(plr_pos.y - new->pos.y, 2));
 	new->dist *= cos((all->plr.dir - new->dir) * M_PI/180);
-	new->size = all->win_height / new->dist;
+	new->size.y = all->win_height / new->dist;
+	new->size.x = new->size.y * (0.75 / ((double)all->win_height / (double)all->win_width));
+	// printf("{%f} size x; {%d} win h; {%d} win widtg\n", new->size.x, all->win_height, all->win_width);
+	// printf("{%f}\n", (double)all->win_height / (double)all->win_width);
 	//sprite_dist *= cos((sprite_dir - all->plr.dir) * M_PI_2/180);
 	// printf("sprite dist{%.3f}\n", sprite_dist * cos((sprite_dir - all->plr.dir) * M_PI/180));
 	//printf("sprite dir{%.3f}; dist{%.3f} size{%.3f}\n", new->dir, new->dist, new->size);
-	new->size = all->win_height / new->dist;
+	//new->size = all->win_height / new->dist;
 	new->next = *sprites;
 	*sprites = new;
 	return (1);
@@ -360,7 +363,7 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	int		column_height;
 	t_point	pos;
 
-	ray.dir = ((int)ray.dir + 360) % 360;
+	//ray.dir = ((int)ray.dir + 360) % 360; 
 	//printf("{%f} ray.len  \n", ray.len_ray);	
 	//ray.len_ray = (ray.len_ray ) / all->map_size.y * cos((ray.dir - all->plr.dir) * (M_PI_2)/180);
 	column_height = (all->win_height/(ray.len_ray * cos((ray.dir - all->plr.dir) * (M_PI)/180)));
@@ -389,6 +392,10 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	// }
 	//-----------//func get number tex-------------
 	int num_tex = 0;
+
+	// if(ray.dir < 0)
+	ray.dir -= (ray.dir > 360) ? 360 : 0;
+	//printf("{%d}{%f}\n", ray.side, ray.dir);
 	
 	if(ray.side == 0)
 	{
@@ -416,7 +423,7 @@ int		ft_draw_wall(t_all *all, t_ray ray)
 	y_texcoord = 0;
 	pos.x = ray.num_ray;
 	pos.y = (all->win_height/2 - column_height/2);
-	printf("{%d} texcoord\n", x_texcoord);
+	//printf("{%d} texcoord\n", x_texcoord);
 	//printf("{%d}{%d} tex config\n", all->tex[0].width, all->tex[0].height);
 
 	int i = (column_height > all->win_height) ? (int)(-pos.y) : 0;
@@ -466,8 +473,8 @@ int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 		
 		
 	// printf("{%f}abs dir\n", abs_dir);
-	int		h_offset = (abs_dir) / 60 * all->win_width + all->win_width/2 - sprite->size/2;
-	int		v_offset = all->win_height / 2 - sprite->size/2;
+	int		h_offset = (abs_dir) / 60 * all->win_width + all->win_width/2 - sprite->size.x/2;
+	int		v_offset = all->win_height / 2 - sprite->size.y/2;
 	
 	// printf("{%.2f} spr dir {%.2f} plr dir {%.2f} разница\n", sprite->dir, all->plr.dir, (sprite->dir - all->plr.dir));
 	
@@ -475,19 +482,20 @@ int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[])
 	int i = -1;
 	int j = -1;
 	
+	//printf("{%f} -h {%f} - v size  \n", sprite->size.x, sprite->size.y);
 	//printf("{%d} -h {%d} - v offset  \n", h_offset, v_offset);
-	while (i++ < sprite->size)
+	while (i++ < sprite->size.x)
 	{
 		if(h_offset+i < 0 || h_offset + i >= all->win_width)
 			continue;
 		//printf("{%.2f ray len {%d}}{%.2f sprdist}\n", arr_len_ray[h_offset+i], h_offset+i ,sprite_dist);
 		if(arr_len_ray[h_offset+i] < sprite->dist)
 			continue;
-		while (j++ < sprite->size - 2)
+		while (j++ < sprite->size.y - 2)
 		{
 			if(v_offset + j < 0 || v_offset + j >= all->win_height - 5)
 				continue;
-			int color = get_tex_color(&all->tex[4], i*64/sprite->size, j*64/sprite->size);
+			int color = get_tex_color(&all->tex[4], i*64/sprite->size.x, j*64/sprite->size.y);
 			if(color)
 			// {
 				//if(v_offset + j > 1 && v_offset + j < all->win_height)
@@ -511,9 +519,11 @@ int		ft_init_ray(t_all *all, t_ray *ray)
 
 	ray->pos.x = (int)plr_pos.x;
 	ray->pos.y = (int)plr_pos.y;
-	// if(ray->dir == all->plr.dir)
+	 
+	// if(ray->dir < 0)
+	// 	ray->dir += 360;
 	
-	//printf("{%f}{%f}ray pos init \n", ray->pos.x, ray->pos.y);
+//	printf("{%f} ray dir\n", ray->dir);
 	
 	// printf("{%.f}{%.f}\n", plr_pos.x , plr_pos.y);
 	

@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/07 17:38:20 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 18:25:11 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ typedef struct	s_sprite
 {
 	double			dir;
 	double			dist;
-	double			size;
+	t_point			size;
 	t_point			pos;
 	struct s_sprite	*next;
 }				t_sprite;
