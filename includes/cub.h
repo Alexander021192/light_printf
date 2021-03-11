@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/11 19:29:09 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 20:30:13 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,8 @@ typedef struct	s_all // структура для всего вместе
 	char		**map_arr;
 	int			win_width;
 	int			win_height;
+	int			floor_color;
+	int			ceil_color;
 }				t_all;
 
 t_tex_char				g_tex_char;

@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/11 20:23:21 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 20:27:37 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,12 @@ char 	*get_resolution(char *str, int* check_settings, int tex_index)
 	return(ft_strdup(str));
 }
 
+char 	*get_backcolor(char *str, int* check_settings, int tex_index)
+{
+	check_settings[tex_index] = 1;
+	return(ft_strdup(str));
+}
+
 int		ft_parse_settings(t_all *all, char *str, int *check_settings)
 {
 	if(ft_strnstr(str, "R ", 2))
@@ -102,9 +108,9 @@ int		ft_parse_settings(t_all *all, char *str, int *check_settings)
 	else if(ft_strnstr(str, "S ", 2))
 		g_tex_char.sprt_textures = get_texpath(str + 2, check_settings, 5);
 	else if(ft_strnstr(str, "F ", 2))
-		g_tex_char.flr_textures = get_texpath(str + 2, check_settings, 6);
+		g_tex_char.flr_textures = get_backcolor(str + 2, check_settings, 6);
 	else if(ft_strnstr(str, "C ", 2))
-		g_tex_char.cl_textures = get_texpath(str + 2, check_settings, 7);
+		g_tex_char.cl_textures = get_backcolor(str + 2, check_settings, 7);
 	// check settings
 	return (0);
 }
