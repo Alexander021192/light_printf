@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 11:40:26 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/11 19:04:09 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 19:30:46 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,14 +97,16 @@ int		ft_init_textures(t_all *all)
 	return (0);
 }
 
-int		main(void)
+int		main(int argc, char **argv)
 {
 	//принты для проверок
 	//printf("{%f}{%f}{%d} in in update x y and dir pos\n", all.plr.pos.x, all.plr.pos.y, all.plr.dir);
 
+	(void)argc;
+
 	t_all	all;
 
-	all.map_arr = ft_read_map();
+	all.map_arr = ft_read_map(&all, argv);
 	ft_init_map_size(&all);
 	ft_init_config(&all);
 

@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/11 18:25:11 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 19:29:09 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,6 @@ typedef struct	s_all // структура для всего вместе
 
 t_tex_char				g_tex_char;
 
-char	**ft_read_map(void);
+
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 12:21:43 by alexandr          #+#    #+#             */
-/*   Updated: 2021/02/24 17:38:22 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 20:23:21 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,14 @@ char	**make_map(t_list **begin, int size)
 		map[i++] = tmp->content;
 		tmp = tmp->next;
 	}
+
+	while (*begin)
+	{
+		tmp = (*begin)->next;
+		free(*begin);
+		*begin = tmp;
+	}
+	*begin = NULL;
 	//ft_lstclear(begin, free);
 	// i = 0;
 	// while (map[i])
@@ -67,58 +75,69 @@ char	**make_map(t_list **begin, int size)
 	return (map);
 }
 
-int		ft_parse_settings(char *str)
+char	*get_texpath(char *str, int* check_settings, int tex_index)
+{
+	check_settings[tex_index] = 1;
+	return(ft_strdup(str));
+}
+
+char 	*get_resolution(char *str, int* check_settings, int tex_index)
+{
+	check_settings[tex_index] = 1;
+	return(ft_strdup(str));
+}
+
+int		ft_parse_settings(t_all *all, char *str, int *check_settings)
 {
 	if(ft_strnstr(str, "R ", 2))
-		g_tex_char.resolution = ft_strdup(str + 2);
+		g_tex_char.resolution = get_resolution(str + 2, check_settings, 0);
 	else if(ft_strnstr(str, "NO ", 3))
-		g_tex_char.n_textures = ft_strdup(str + 3);
+		g_tex_char.n_textures = get_texpath(str + 3, check_settings, 1);
 	else if(ft_strnstr(str, "SO ", 3))
-		g_tex_char.s_textures = ft_strdup(str + 3);
+		g_tex_char.s_textures = get_texpath(str + 3, check_settings, 2);
 	else if(ft_strnstr(str, "WE ", 3))
-		g_tex_char.w_textures = ft_strdup(str + 3);
+		g_tex_char.w_textures = get_texpath(str + 3, check_settings, 3);
 	else if(ft_strnstr(str, "EA ", 3))
-		g_tex_char.e_textures = ft_strdup(str + 3);
+		g_tex_char.e_textures = get_texpath(str + 3, check_settings, 4);
 	else if(ft_strnstr(str, "S ", 2))
-		g_tex_char.sprt_textures = ft_strdup(str + 2);
+		g_tex_char.sprt_textures = get_texpath(str + 2, check_settings, 5);
 	else if(ft_strnstr(str, "F ", 2))
-		g_tex_char.flr_textures = ft_strdup(str + 2);
+		g_tex_char.flr_textures = get_texpath(str + 2, check_settings, 6);
 	else if(ft_strnstr(str, "C ", 2))
-		g_tex_char.cl_textures = ft_strdup(str + 2);
+		g_tex_char.cl_textures = get_texpath(str + 2, check_settings, 7);
+	// check settings
 	return (0);
 }
 
-char	**ft_read_map(void)
+char	**ft_read_map(t_all *all, char **argv)
 {
 	int		fd;
 	char	*line;
 	t_list	*begin;
-		
+	
+	int	check_settings[9];
+	ft_bzero(check_settings, 9);
+			
 	line = NULL;
 	begin = NULL;
-	fd = open("./maps/test.cub", O_RDONLY);
+	fd = open(argv[1], O_RDONLY);
 	while (get_next_line(fd, &line))
 	{
-
 		if (ft_strchr("NRSWEFC", *line))
-			ft_parse_settings(line);
+			ft_parse_settings(all, line, check_settings);
 		else // parse map 
 			ft_lstadd_back(&begin, ft_lstnew(ft_cut_space(line)));
-		// free(line); а не протекает ли?
-		// line = NULL;
+		free(line);// а не протекает ли?
+		line = NULL;
 	}
 	ft_lstadd_back(&begin, ft_lstnew(ft_cut_space(line)));
+	free(line);
+
+	for (size_t i = 0; i < 9; i++)
+	{
+		printf("{%d} check\n", check_settings[i]);
+	}
 	
-	//printf("%d size lst\n", ft_lstsize(begin));
-	//ft_lstprint(begin);
-	// printf("%s\n", g_pars.resolution);
-	// printf("%s\n", g_pars.n_textures);
-	// printf("%s\n", g_pars.s_textures);
-	// printf("%s\n", g_pars.w_textures);
-	// printf("%s\n", g_pars.e_textures);
-	// printf("%s\n", g_pars.sprt_textures);
-	// printf("%s\n", g_pars.flr_textures);
-	// printf("%s\n", g_pars.cl_textures);
 	
 	close(fd);
 	

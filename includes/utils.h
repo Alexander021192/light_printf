@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:02:58 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/04 17:14:15 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 19:31:04 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 // необходимо записать эту строку короче all->map_arr[(int)pos.y / (int)all->map_size.y][(int)pos.x / (int)all->map_size.x] != '1'
 
-char	**ft_read_map(void);
+char	**ft_read_map(t_all *all, char **argv);
 void	update_screen(t_all *all);
 int		key_press(int keycode, t_all *all);
 int		key_release(int keycode, t_all *all);

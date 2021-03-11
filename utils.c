@@ -6,7 +6,7 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:11:29 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/11 19:04:33 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/11 19:19:43 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,8 @@ int		key_release(int keycode, t_all *all)
 	else if (keycode == KEY_ESC)
 	{
 		printf("window closed\n");
-		return (mlx_destroy_window(all->win.ptr, all->win.win));
+		mlx_destroy_window(all->win.ptr, all->win.win);
+		exit(0);
 	}
 	return (0);
 }

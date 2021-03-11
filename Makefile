@@ -6,7 +6,7 @@
 #    By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/07 11:05:52 by rchallie          #+#    #+#              #
-#    Updated: 2021/03/07 11:11:06 by ocalamar         ###   ########.fr        #
+#    Updated: 2021/03/11 20:06:36 by ocalamar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,10 +29,10 @@ CC_FLAGS = -Wall -Wextra -Werror
 MLX_FLAGS = -framework OpenGL -framework Appkit
 
 1: 
-		$(CC) $(SRCS1) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit	&& ./a.out
+		$(CC) $(SRCS1) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit && ./a.out ./maps/test.cub
 
 2:
-		$(CC) $(SRCS2) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit	&& ./a.out
+		$(CC) $(SRCS1) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit
 
 # $(OBJS_DIR)%.o : %.c
 # 	@mkdir -p $(OBJS_DIR)
