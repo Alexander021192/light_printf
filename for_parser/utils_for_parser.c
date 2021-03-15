@@ -119,6 +119,9 @@ char	*ft_strtrim(char const *str, char const *set)
 	return (ft_substr(str, start, end - start));
 }
 
+//-------------------------------------//
+
+
 int		ft_get_num(char **str)
 {
 	int	num = 0;
