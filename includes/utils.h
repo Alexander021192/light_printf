@@ -6,20 +6,24 @@
 /*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/16 14:02:58 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/03/11 19:31:04 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/16 16:13:49 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UTILS_H
 # define UTILS_H
-# include "cub.h"
 
+
+# define MAP(y,x) map[(int)y][(int)x]
 # define MAX(x, y) ((x > y) ? x : y)
 # define ABS(x)	((x > 0) ? x : -x)
 
 // необходимо записать эту строку короче all->map_arr[(int)pos.y / (int)all->map_size.y][(int)pos.x / (int)all->map_size.x] != '1'
 
+
+int		ft_init_textures(t_all *all);
 char	**ft_read_map(t_all *all, char **argv);
+int		check_map(char **map);
 void	update_screen(t_all *all);
 int		key_press(int keycode, t_all *all);
 int		key_release(int keycode, t_all *all);
@@ -37,5 +41,6 @@ int		ft_draw_back(t_all *all);
 int		load_tex(t_all *all, t_tex *tex, char *path);
 int		ft_draw_sprite(t_all *all, t_sprite *sprite, double arr_len_ray[]);
 t_sprite *ft_sort_list(t_sprite *root);
+void	ft_init_map_size(t_all *all);
 
 #endif

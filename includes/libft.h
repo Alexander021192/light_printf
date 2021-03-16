@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexandr <alexandr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/11 17:14:43 by ocalamar          #+#    #+#             */
-/*   Updated: 2021/01/26 12:38:54 by alexandr         ###   ########.fr       */
+/*   Updated: 2021/03/16 14:40:19 by ocalamar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 
 # include <unistd.h>
 # include <stdlib.h>
-
 # include <fcntl.h>
 
 int					get_next_line(int fd, char **line);

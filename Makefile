@@ -6,21 +6,21 @@
 #    By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/07 11:05:52 by rchallie          #+#    #+#              #
-#    Updated: 2021/03/11 20:06:36 by ocalamar         ###   ########.fr        #
+#    Updated: 2021/03/16 15:41:46 by ocalamar         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS1 = mlx_mac.c 			\
-		parser_map.c 	\
-		utils.c			\
+NAME = CUB
 
-
-SRCS2 = mlx_mac.c 			\
-		parser_map.c 	\
-		utils_copy.c			\
+SRCS1 = main.c 					\
+		parser/parser_map.c 	\
+		utils/check_map.c		\
+		utils/utils.c			\
 
 
 # NAME = libft_with_gnl.a
+LIBS =	libft_with_gnl.a \
+		libmlx.dylib	\
 
 CC = gcc
 
@@ -29,10 +29,7 @@ CC_FLAGS = -Wall -Wextra -Werror
 MLX_FLAGS = -framework OpenGL -framework Appkit
 
 1: 
-		$(CC) $(SRCS1) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit && ./a.out ./maps/test.cub
-
-2:
-		$(CC) $(SRCS1) libft_with_gnl.a libmlx.dylib -framework OpenGL -framework Appkit
+		$(CC) $(SRCS1) $(LIBS) $(MLX_FLAGS) -o $(NAME) && ./$(NAME) ./maps/test.cub
 
 # $(OBJS_DIR)%.o : %.c
 # 	@mkdir -p $(OBJS_DIR)
