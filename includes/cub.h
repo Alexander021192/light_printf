@@ -3,20 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   cub.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ocalamar <ocalamar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alexandr <alexandr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 13:00:10 by alexandr          #+#    #+#             */
-/*   Updated: 2021/03/16 17:32:52 by ocalamar         ###   ########.fr       */
+/*   Updated: 2021/03/17 13:17:45 by alexandr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB_H
 # define CUB_H
 
+# include "mlx.h"
+# include "libft.h"
+# include "utils.h" //need right root
+# include <stdio.h>
+# include <math.h>
 
 # define HERE printf("\nHERE\n");
 
-# define MAP_SCALE 1 // условный размер карты от основного экрана
+# define MAP_SCALE 1
 # define SPEED 0.05
 # define MIN_WIN_WIDTH 640
 # define MIN_WIN_HEIGHT 480
@@ -46,17 +51,16 @@
 
 # define RIGHT 			11
 # define DOWN 			22
-# define LEFT 			33 
+# define LEFT 			33
 # define UP 			44
 
-
-typedef struct	s_point // структура для точки
+typedef struct	s_point
 {
 	double			x;
 	double			y;
-}				  t_point;
+}				t_point;
 
-typedef struct	s_plr //структура для игрока и луча
+typedef struct	s_plr
 {
 	double		dir;
 	t_point		pos;
@@ -72,15 +76,14 @@ typedef struct	s_image
 	int		endian;
 }				t_image;
 
-typedef	struct	s_win //структура для окна
+typedef	struct	s_win
 {
 	void		*ptr;
 	void		*win;
 	t_image		screen;
 }				t_win;
 
-
-typedef struct s_ray
+typedef struct	s_ray
 {
 	double	dir;
 	double	len_ray;
@@ -101,7 +104,6 @@ typedef struct	s_sprite
 	struct s_sprite	*next;
 }				t_sprite;
 
-
 typedef struct	s_tex
 {
 	char	*path;
@@ -116,7 +118,7 @@ typedef struct	s_tex
 	int		endian;
 }				t_tex;
 
-typedef struct	s_all 
+typedef struct	s_all
 {
 	t_win		win;
 	t_plr		plr;
@@ -132,11 +134,5 @@ typedef struct	s_all
 	int			floor_color;
 	int			ceil_color;
 }				t_all;
-
-# include "mlx.h"
-# include "libft.h"
-# include "utils.h"
-# include <stdio.h>
-# include <math.h>
 
 #endif
